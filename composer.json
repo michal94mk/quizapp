@@ -1,0 +1,11 @@
+{
+    "name": "michal94mk/quizapp",
+    "description": "A PHP quiz application developed by michal94mk",
+    "author": "Michał Kołodziejczyk <michal94mk@o2.pl>",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
