@@ -20,6 +20,10 @@ logs/
 *.sql     # Ignore SQL dump files
 *.sqlite  # Ignore SQLite database files
 
+# Do not ignore SQL files in the 'sql' directory
+# Includes essential files like create_tables.sql for database initialization
+!sql/*.sql
+
 # Ignore session files
 /session/
 
