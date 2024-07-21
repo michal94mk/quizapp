@@ -1,0 +1,28 @@
+# Ignore the vendor directory where Composer dependencies are stored
+/vendor/
+
+# Ignore environment configuration file which contains sensitive information
+.env
+
+# Ignore cache and log directories
+/cache/
+logs/
+
+# Ignore IDE-specific files and directories
+*.log     # Ignore log files
+*.tmp     # Ignore temporary files
+*.swp     # Ignore Vim swap files
+*.swo     # Ignore Vim swap files
+.idea/    # Ignore PhpStorm project files
+.vscode/  # Ignore Visual Studio Code settings
+
+# Ignore database files
+*.sql     # Ignore SQL dump files
+*.sqlite  # Ignore SQLite database files
+
+# Ignore session files
+/session/
+
+# Ignore system-specific temporary files
+.DS_Store   # Ignore macOS Finder metadata file
+Thumbs.db   # Ignore Windows thumbnail cache file
