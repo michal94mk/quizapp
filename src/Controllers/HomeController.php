@@ -11,12 +11,12 @@ class HomeController
             'content' => 'To jest treść strony głównej.',
         ];
 
-        $this->loadView('home', $data);
+        $this->loadView('app', $data);
     }
 
     private function loadView($viewName, $data)
     {
         extract($data);
-        require "src/Views/{$viewName}.php";
+        require "src/Views/layouts/{$viewName}.php";
     }
 }
