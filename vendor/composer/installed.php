@@ -3,7 +3,7 @@
         'name' => 'michal94mk/quizapp',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'bf0265b96d45a4fb2ef1636a71f54205ffbb24a9',
+        'reference' => 'f6eb70517ef93acc2e9abff2e3924037452a491e',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'michal94mk/quizapp' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'bf0265b96d45a4fb2ef1636a71f54205ffbb24a9',
+            'reference' => 'f6eb70517ef93acc2e9abff2e3924037452a491e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -22,7 +22,7 @@ logs/
 
 # Do not ignore SQL files in the 'sql' directory
 # Includes essential files like create_tables.sql for database initialization
-!sql/*.sql
+!/sql/*.sql
 
 # Ignore session files
 /session/

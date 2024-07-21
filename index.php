@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . '/config/bootstrap.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Controllers\HomeController;
+// use App\Controllers\HomeController;
 
-$controller = new HomeController();
-$controller->index();
+// $controller = new HomeController();
+// $controller->index();
