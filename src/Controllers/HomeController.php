@@ -6,17 +6,23 @@ class HomeController
 {
     public function index()
     {
-        $data = [
-            'title' => 'Witaj na stronie głównej',
-            'content' => 'To jest treść strony głównej.',
-        ];
+        echo 'this is index function';
+        // $data = [
+        //     'title' => 'Witaj na stronie głównej',
+        //     'content' => 'To jest treść strony głównej.',
+        // ];
 
-        $this->loadView('app', $data);
+        // $this->loadView('app', $data);
     }
 
-    private function loadView($viewName, $data)
+    public function about()
     {
-        extract($data);
-        require "src/Views/layouts/{$viewName}.php";
+        echo 'this is about function';
     }
+
+    // private function loadView($viewName, $data)
+    // {
+    //     extract($data);
+    //     require "src/Views/layouts/{$viewName}.php";
+    // }
 }

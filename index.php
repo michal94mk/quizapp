@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-// use App\Controllers\HomeController;
+use App\App;
 
-// $controller = new HomeController();
-// $controller->index();
+$app = new App();
+$app->run();
