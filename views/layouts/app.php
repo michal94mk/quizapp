@@ -16,7 +16,13 @@
         </nav>
     </header>
     <main>
-        <?php echo $content; ?>
+        <div class="container">
+            <?php if (isset($content) && !empty($content)): ?>
+                <?php echo $content; ?>
+            <?php else: ?>
+                <p>No content available.</p>
+            <?php endif; ?>
+        </div>
     </main>
     <footer>
         <p>Footer content here</p>

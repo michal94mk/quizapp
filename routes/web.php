@@ -8,3 +8,4 @@ $router->get('/', [HomeController::class, 'index']);
 $router->get('/about', [HomeController::class, 'about']);
 
 $router->get('/admin', [AdminController::class, 'index']);
+$router->get('/admin/quizzes', [AdminController::class, 'quizzes']);

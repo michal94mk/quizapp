@@ -13,6 +13,7 @@ class Quiz {
 
     public function getAllQuizzes() {
         $stmt = $this->pdo->query('SELECT * FROM quizzes');
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $quizzes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $quizzes;
     }
 }

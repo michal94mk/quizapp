@@ -7,7 +7,18 @@ use App\Helper\PathHelper;
 use App\Models\Quiz;
 
 class AdminController {
+
     public function index() {
+        $view = new View(
+            PathHelper::layout('admin/admin.php')
+        );
+
+        $view->with([
+            'title' => 'Admin Page',
+        ])->render();
+    }
+
+    public function quizzes() {
         $quizModel = new Quiz();
         $quizzes = $quizModel->getAllQuizzes();
 
@@ -17,8 +28,7 @@ class AdminController {
         );
 
         $view->with([
-            'title' => 'Admin Page',
-            'header' => 'Welcome to admin page',
+            'title' => 'Quizzes',
             'quizzes' => $quizzes
         ])->render();
     }
