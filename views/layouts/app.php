@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($title) ? $title : 'My Application'; ?></title>
-    <link rel="stylesheet" href="public/css/style.css">
+    <title><?php echo htmlspecialchars($title ?? 'Default Title'); ?></title>
 </head>
 <body>
     <header>
@@ -15,13 +14,11 @@
             </ul>
         </nav>
     </header>
-
     <main>
         <?php echo $content; ?>
     </main>
-
     <footer>
-        <p>&copy; <?php echo date('Y'); ?> My Application. All rights reserved.</p>
+        <p>Footer content here</p>
     </footer>
 </body>
 </html>
