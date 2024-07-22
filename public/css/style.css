@@ -1,13 +1,13 @@
-/* public/css/styles.css */
+/* public/css/style.css */
 
-/* Resetowanie domyślnych marginesów i paddingu */
+/* Resetting default margins and padding */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Ustawienia ogólne dla body */
+/* General settings for body */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -15,7 +15,7 @@ body {
     background-color: #f4f4f4;
 }
 
-/* Stylizacja nagłówka */
+/* Header styling */
 header {
     background: #333;
     color: #fff;
@@ -42,7 +42,7 @@ nav ul li a:hover {
     text-decoration: underline;
 }
 
-/* Stylizacja głównej sekcji */
+/* Main section styling */
 main {
     padding: 20px;
     max-width: 1200px;
@@ -52,7 +52,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Stylizacja stopki */
+/* Footer styling */
 footer {
     background: #333;
     color: #fff;
@@ -63,7 +63,253 @@ footer {
     bottom: 0;
 }
 
-/* Responsywność */
+/* Adding simple CSS styles for cards */
+.quiz-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 20px;
+}
+
+.quiz-card {
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    width: calc(33.333% - 32px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.quiz-card:hover {
+    transform: translateY(-5px);
+}
+
+.quiz-title {
+    font-size: 1.2em;
+    margin-bottom: 8px;
+}
+
+.quiz-description {
+    color: #555;
+}
+
+/* Admin */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 24px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info span {
+    margin-right: 20px;
+}
+
+.user-info a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.user-info a:hover {
+    text-decoration: underline;
+}
+
+.toggle-btn {
+    display: none;
+    background-color: #333;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    z-index: 1001;
+}
+
+.hamburger-icon {
+    width: 30px;
+    height: 20px;
+    position: relative;
+}
+
+.bar {
+    background-color: #fff;
+    height: 4px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    transition: 0.3s ease;
+}
+
+.bar:nth-child(1) {
+    top: 0;
+}
+
+.bar:nth-child(2) {
+    top: 8px;
+}
+
+.bar:nth-child(3) {
+    top: 16px;
+}
+
+.horizontal-nav {
+    background-color: #444;
+    color: #fff;
+    padding: 10px 0;
+}
+
+.horizontal-nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.horizontal-nav ul li {
+    margin: 0 20px;
+}
+
+.horizontal-nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.horizontal-nav ul li a:hover {
+    text-decoration: underline;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transform: translateX(-250px);
+    transition: transform 0.3s ease;
+}
+
+.sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar nav ul li {
+    margin: 20px 0;
+}
+
+.sidebar nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar nav ul li a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    display: flex;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.main-content {
+    flex-grow: 1;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.main-content h1 {
+    margin-top: 0;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    width: 30%;
+}
+
+.recent-activity {
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.recent-activity h2 {
+    margin-top: 0;
+}
+
+.recent-activity ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recent-activity ul li {
+    margin: 10px 0;
+}
+/* /Admin */
+
+
+
+/* Responsiveness */
+
+/* Admin */
+@media (min-width: 769px) {
+    .sidebar {
+        display: none;
+    }
+
+    .horizontal-nav {
+        display: block;
+    }
+
+    .toggle-btn {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .horizontal-nav {
+        display: none;
+    }
+
+    .toggle-btn {
+        display: block;
+    }
+}
+/* /Admin */
+
 @media (max-width: 768px) {
     nav ul li {
         display: block;

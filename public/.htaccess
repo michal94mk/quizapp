@@ -1,0 +1,4 @@
+# Allow access to CSS, JS, and images
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
