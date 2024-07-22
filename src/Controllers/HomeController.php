@@ -23,6 +23,19 @@ class HomeController {
         ])->render();
     }
 
+    public function register() {
+        $view = new View(
+            PathHelper::view('register.php'),
+            PathHelper::layout('app.php')
+        );
+
+        $view->with([
+            'title' => 'Register',
+            'header' => 'About Us',
+            'content' => 'This is the about page.'
+        ])->render();
+    }
+
     public function about() {
         $view = new View(
             PathHelper::view('about.php'),
