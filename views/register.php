@@ -1,5 +1,5 @@
     <h1>Register</h1>
-    <form action="register.php" method="POST">
+    <form action="/register" method="POST">
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" required>
         <br>
