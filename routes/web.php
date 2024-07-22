@@ -13,3 +13,6 @@ $router->get('/admin/quizzes', [AdminController::class, 'quizzes']);
 
 $router->get('/register-form', [AuthController::class, 'showRegisterForm']);
 $router->post('/register', [AuthController::class, 'register']);
+$router->get('/login-form', [AuthController::class, 'showLoginForm']);
+$router->post('/login', [AuthController::class, 'login']);
+$router->get('/logout', [AuthController::class, 'logout']);

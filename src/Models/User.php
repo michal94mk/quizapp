@@ -76,4 +76,24 @@ class User {
             return 'Registration failed.';
         }
     }
+
+    public function login($username, $password) {
+        $query = "SELECT password FROM " . $this->table_name . " WHERE username = :username LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+
+        if ($stmt->rowCount() === 0) {
+            return 'Username does not exist.';
+        }
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $hashedPassword = $row['password'];
+
+        if (password_verify($password, $hashedPassword)) {
+            return 'Login successful.';
+        } else {
+            return 'Invalid password.';
+        }
+    }
 }

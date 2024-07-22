@@ -8,38 +8,91 @@ use App\View\View;
 
 class AuthController {
     public function showRegisterForm() {
+
         $view = new View(
             PathHelper::view('register.php'),
-            PathHelper::layout('app.php'),
+            PathHelper::layout('app.php')
         );
 
+        $error = $_SESSION['register_error'] ?? null;
+        $success = $_SESSION['register_success'] ?? null;
+
         $view->with([
-            'title' => 'Admin Page',
+            'title' => 'Register Page',
+            'error' => $error,
+            'success' => $success
         ])->render();
+
+        unset($_SESSION['register_error']);
+        unset($_SESSION['register_success']);
     }
 
     public function register() {
-        // Sprawdza, czy dane są przesyłane metodą POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
             $email = $_POST['email'] ?? '';
 
-            // Tworzy instancję modelu użytkownika
             $user = new User();
             $message = $user->register($username, $password, $email);
 
-            // Wyświetla odpowiedni widok na podstawie wyniku rejestracji
             if ($message === 'Registration successful.') {
-                $view = new View(PathHelper::view('register_success.php'));
-                $view->with(['username' => htmlspecialchars($username)])->render();
+                $_SESSION['register_success'] = 'Registration successful. You can now log in.';
+                header('Location: /register_success');
+                exit();
             } else {
-                $view = new View(PathHelper::view('register.php'));
-                $view->with(['error' => $message])->render();
+                $_SESSION['register_error'] = $message;
+                header('Location: /register');
+                exit();
             }
         } else {
             http_response_code(405);
             echo "Method Not Allowed";
         }
     }
+
+    public function showLoginForm() {
+        if (isset($_SESSION['user_id'])) {
+            header('Location: /');
+            exit();
+        }
+
+        $view = new View(
+            PathHelper::view('login.php'),
+            PathHelper::layout('app.php')
+        );
+        $view->render();
+    }
+
+    public function login() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+    
+            $user = new User();
+            $message = $user->login($username, $password);
+    
+            if ($message === 'Login successful.') {
+                $_SESSION['user_id'] = $username;
+                header('Location: /?message=loggedin');
+                exit();
+            } else {
+                $view = new View(PathHelper::view('login.php'));
+                $view->with(['error' => $message])->render();
+            }
+        } else {
+            http_response_code(405);
+            echo "Method Not Allowed";
+        }
+    }      
+
+    public function logout() {    
+        session_unset();
+        session_destroy();
+    
+        header('Location: /?message=loggedout');
+        exit();
+    }       
 }
