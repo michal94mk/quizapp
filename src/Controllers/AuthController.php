@@ -70,16 +70,17 @@ class AuthController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
-
+    
             $user = new User();
-            $message = $user->login($username, $password);
-
-            if ($message === 'Login successful.') {
+            $result = $user->login($username, $password);
+    
+            if (is_array($result) && $result['message'] === 'Login successful.') {
                 $_SESSION['user_id'] = $username;
+                $_SESSION['user_role'] = $result['role'];
                 $_SESSION['login_message'] = 'Logged in successfully.';
                 header('Location: /');
             } else {
-                $_SESSION['login_error'] = $message;
+                $_SESSION['login_error'] = $result;
                 header('Location: /login-form');
             }
             exit();
@@ -87,6 +88,17 @@ class AuthController {
             http_response_code(405);
             echo "Method Not Allowed";
         }
+    }
+
+    public function showAdminPanel() {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+            header('Location: /?message=accessdenied');
+            exit();
+        }
+        $view = new View(
+            PathHelper::layout('admin/admin.php')
+        );
+        $view->with(['title' => 'Admin Panel'])->render();
     }
 
     public function logout() {

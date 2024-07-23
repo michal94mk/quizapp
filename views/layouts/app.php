@@ -12,6 +12,9 @@
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
+                <?php if ($_SESSION['user_role'] === 'admin') { ?>
+                    <li><a href="/admin">Admin Panel</a></li>
+                <?php }; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_id']); ?> ]</a></li>
                 <?php else: ?>
@@ -21,7 +24,6 @@
             </ul>
         </nav>
     </header>
-
     <!-- Display messages -->
     <?php if (isset($_SESSION['register_success'])): ?>
         <div class="message success">
@@ -43,13 +45,19 @@
             <?php echo htmlspecialchars($_SESSION['login_error']); ?>
             <?php unset($_SESSION['login_error']); ?>
         </div>
-    <?php elseif (isset($_GET['message']) && $_GET['message'] === 'loggedout'): ?>
+    <?php endif; ?>
+    
+    <!-- Additional messages using GET parameters -->
+    <?php if (isset($_GET['message']) && $_GET['message'] === 'loggedout'): ?>
         <div class="message success">
             Logged out successfully.
+            <script>window.history.replaceState({}, document.title, window.location.pathname);</script>
         </div>
-        <?php
-            echo '<script>window.history.replaceState({}, document.title, window.location.pathname);</script>';
-        ?>
+    <?php elseif (isset($_GET['message']) && $_GET['message'] === 'accessdenied'): ?>
+        <div class="message error">
+            Access denied.
+            <script>window.history.replaceState({}, document.title, window.location.pathname);</script>
+        </div>
     <?php endif; ?>
 
     <main>

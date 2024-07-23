@@ -3,7 +3,7 @@
 use App\Controllers\HomeController;
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
-
+use App\Middlewares\AdminMiddleware;
 
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/about', [HomeController::class, 'about']);
@@ -16,3 +16,6 @@ $router->post('/register', [AuthController::class, 'register']);
 $router->get('/login-form', [AuthController::class, 'showLoginForm']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/logout', [AuthController::class, 'logout']);
+
+// Definiowanie grupy middleware dla tras zaczynających się od '/admin'
+$router->middlewareGroup('/admin', [AdminMiddleware::class]);

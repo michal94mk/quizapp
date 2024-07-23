@@ -103,8 +103,6 @@ footer {
 
 .message {
     padding: 10px;
-    margin: 0; /* Removed margin for full width */
-    border-radius: 0; /* Removed border-radius for full width */
     font-weight: bold;
     text-align: center;
 }

@@ -13,6 +13,7 @@ class User {
     public $username;
     public $password;
     public $email;
+    public $role;  // Dodana kolumna
     public $created_at;
 
     public function __construct() {
@@ -24,40 +25,25 @@ class User {
         $query = "INSERT INTO " . $this->table_name . " 
                   SET username = :username, 
                       password = :password, 
-                      email = :email";
+                      email = :email, 
+                      role = :role";
 
         $stmt = $this->conn->prepare($query);
 
         $this->username = htmlspecialchars(strip_tags($this->username));
         $this->password = htmlspecialchars(strip_tags($this->password));
         $this->email = htmlspecialchars(strip_tags($this->email));
+        $this->role = htmlspecialchars(strip_tags($this->role));
 
         $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':password', $this->password);
         $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':role', $this->role);
 
         return $stmt->execute();
     }
 
-    public function usernameExists($username) {
-        $query = "SELECT id FROM " . $this->table_name . " WHERE username = :username LIMIT 1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-
-        return $stmt->rowCount() > 0;
-    }
-
-    public function emailExists($email) {
-        $query = "SELECT id FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
-
-        return $stmt->rowCount() > 0;
-    }
-
-    public function register($username, $password, $email) {
+    public function register($username, $password, $email, $role = 'user') {
         if ($this->usernameExists($username)) {
             return 'Username already exists.';
         }
@@ -69,6 +55,7 @@ class User {
         $this->username = $username;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
         $this->email = $email;
+        $this->role = $role;
     
         if ($this->save()) {
             return 'Registration successful.';
@@ -76,10 +63,9 @@ class User {
             return 'Registration failed.';
         }
     }
-    
 
     public function login($username, $password) {
-        $query = "SELECT password FROM " . $this->table_name . " WHERE username = :username LIMIT 1";
+        $query = "SELECT password, role FROM " . $this->table_name . " WHERE username = :username LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->execute();
@@ -90,9 +76,10 @@ class User {
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $hashedPassword = $row['password'];
+        $role = $row['role'];
 
         if (password_verify($password, $hashedPassword)) {
-            return 'Login successful.';
+            return ['message' => 'Login successful.', 'role' => $role];
         } else {
             return 'Invalid password.';
         }

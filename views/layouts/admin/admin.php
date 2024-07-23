@@ -10,10 +10,6 @@
     <header>
         <div class="navbar">
             <div class="logo">Admin Panel</div>
-            <div class="user-info">
-                <span>Welcome, Admin</span>
-                <a href="logout.php">Logout</a>
-            </div>
             <button class="toggle-btn" id="toggle-btn">
                 <div class="hamburger-icon">
                     <div class="bar"></div>
@@ -25,19 +21,27 @@
     </header>
     <nav class="horizontal-nav">
         <ul>
+            <li><a href="/">Home</a></li>
             <li><a href="/admin">Dashboard</a></li>
             <li><a href="/admin/quizzes">Quizzes</a></li>
             <li><a href="users.php">Users</a></li>
             <li><a href="statistics.php">Stats</a></li>
+            <?php if (isset($_SESSION['user_id'])) { ?>
+                <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_id']); ?> ]</a></li>
+            <?php }; ?>
         </ul>
     </nav>
     <aside class="sidebar" id="sidebar">
         <nav>
             <ul>
+                <li><a href="/">Home</a></li>
                 <li><a href="/admin">Dashboard</a></li>
                 <li><a href="/admin/quizzes">Quizzes</a></li>
                 <li><a href="users.php">Users</a></li>
                 <li><a href="statistics.php">Stats</a></li>
+                <?php if (isset($_SESSION['user_id'])) { ?>
+                    <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_id']); ?> ]</a></li>
+                <?php }; ?>
             </ul>
         </nav>
     </aside>
