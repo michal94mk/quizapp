@@ -61,21 +61,22 @@ class User {
         if ($this->usernameExists($username)) {
             return 'Username already exists.';
         }
-
+    
         if ($this->emailExists($email)) {
             return 'Email already exists.';
         }
-
+    
         $this->username = $username;
         $this->password = password_hash($password, PASSWORD_BCRYPT);
         $this->email = $email;
-
+    
         if ($this->save()) {
             return 'Registration successful.';
         } else {
             return 'Registration failed.';
         }
     }
+    
 
     public function login($username, $password) {
         $query = "SELECT password FROM " . $this->table_name . " WHERE username = :username LIMIT 1";

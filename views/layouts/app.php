@@ -22,20 +22,34 @@
         </nav>
     </header>
 
-    <?php if (isset($_GET['message'])): ?>
-        <div class="message-container">
-            <?php
-            $message = $_GET['message'];
-            if ($message === 'loggedin') {
-                echo '<div class="message success">Zalogowano pomyślnie.</div>';
-            } elseif ($message === 'loggedout') {
-                echo '<div class="message success">Wylogowano pomyślnie.</div>';
-            }
-            ?>
+    <!-- Display messages -->
+    <?php if (isset($_SESSION['register_success'])): ?>
+        <div class="message success">
+            <?php echo htmlspecialchars($_SESSION['register_success']); ?>
+            <?php unset($_SESSION['register_success']); ?>
         </div>
-        <script>
-            window.history.replaceState({}, document.title, window.location.pathname);
-        </script>
+    <?php elseif (isset($_SESSION['register_error'])): ?>
+        <div class="message error">
+            <?php echo htmlspecialchars($_SESSION['register_error']); ?>
+            <?php unset($_SESSION['register_error']); ?>
+        </div>
+    <?php elseif (isset($_SESSION['login_message'])): ?>
+        <div class="message success">
+            <?php echo htmlspecialchars($_SESSION['login_message']); ?>
+            <?php unset($_SESSION['login_message']); ?>
+        </div>
+    <?php elseif (isset($_SESSION['login_error'])): ?>
+        <div class="message error">
+            <?php echo htmlspecialchars($_SESSION['login_error']); ?>
+            <?php unset($_SESSION['login_error']); ?>
+        </div>
+    <?php elseif (isset($_GET['message']) && $_GET['message'] === 'loggedout'): ?>
+        <div class="message success">
+            Logged out successfully.
+        </div>
+        <?php
+            echo '<script>window.history.replaceState({}, document.title, window.location.pathname);</script>';
+        ?>
     <?php endif; ?>
 
     <main>
