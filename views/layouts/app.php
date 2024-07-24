@@ -12,7 +12,7 @@
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
-                <?php if ($_SESSION['user_role'] === 'admin') { ?>
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') { ?>
                     <li><a href="/admin">Admin Panel</a></li>
                 <?php }; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
