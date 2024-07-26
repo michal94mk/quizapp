@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Database\Database;
-use PDO;
 
 class User {
     private $conn;
@@ -13,7 +12,7 @@ class User {
     public $username;
     public $password;
     public $email;
-    public $role;  // Dodana kolumna
+    public $role;
     public $created_at;
 
     public function __construct() {
@@ -64,24 +63,41 @@ class User {
         }
     }
 
-    public function login($username, $password) {
-        $query = "SELECT password, role FROM " . $this->table_name . " WHERE username = :username LIMIT 1";
+    public function usernameExists($username) {
+        $query = "SELECT id FROM " . $this->table_name . " WHERE username = :username";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
-        if ($stmt->rowCount() === 0) {
-            return 'Username does not exist.';
-        }
-
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $hashedPassword = $row['password'];
-        $role = $row['role'];
-
-        if (password_verify($password, $hashedPassword)) {
-            return ['message' => 'Login successful.', 'role' => $role];
-        } else {
-            return 'Invalid password.';
-        }
+        return $stmt->rowCount() > 0;
     }
+
+    public function emailExists($email) {
+        $query = "SELECT id FROM " . $this->table_name . " WHERE email = :email";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
+    public function login($username, $password) {
+        $query = "SELECT id, username, role, password FROM users WHERE username = :username";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        if ($user && password_verify($password, $user['password'])) {
+            return [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'role' => $user['role'],
+                'message' => 'Login successful.'
+            ];
+        } else {
+            return 'Invalid username or password.';
+        }
+    }    
 }

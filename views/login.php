@@ -11,3 +11,4 @@
     <br>
     <button type="submit">Login</button>
 </form>
+<a href="/register-form">Nie masz konta? Zarejestruj się.</a>

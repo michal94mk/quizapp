@@ -27,7 +27,7 @@
             <li><a href="users.php">Users</a></li>
             <li><a href="statistics.php">Stats</a></li>
             <?php if (isset($_SESSION['user_id'])) { ?>
-                <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_id']); ?> ]</a></li>
+                <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_name']); ?> ]</a></li>
             <?php }; ?>
         </ul>
     </nav>

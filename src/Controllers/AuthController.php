@@ -75,15 +75,17 @@ class AuthController {
             $result = $user->login($username, $password);
     
             if (is_array($result) && $result['message'] === 'Login successful.') {
-                $_SESSION['user_id'] = $username;
+                $_SESSION['user_id'] = $result['id'];
+                $_SESSION['user_name'] = $result['username'];
                 $_SESSION['user_role'] = $result['role'];
                 $_SESSION['login_message'] = 'Logged in successfully.';
                 header('Location: /');
+                exit();
             } else {
                 $_SESSION['login_error'] = $result;
                 header('Location: /login-form');
+                exit();
             }
-            exit();
         } else {
             http_response_code(405);
             echo "Method Not Allowed";

@@ -16,7 +16,7 @@ class Router {
 
     private function addRoute($method, $path, $handler) {
         $this->routes[] = [
-            'method' => $method,
+            'method' => strtoupper($method),
             'path' => $path,
             'handler' => $handler
         ];
@@ -35,32 +35,57 @@ class Router {
         return [];
     }
 
-    public function dispatch($method, $uri) {
+    private function matchRoute($method, $uri, &$params) {
         foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $uri) {
-                $middlewares = $this->getMiddlewares($uri);
+            if ($route['method'] === strtoupper($method)) {
+                $pattern = preg_replace('/\{[^\}]+\}/', '([^/]+)', $route['path']);
+                $pattern = '#^' . $pattern . '$#';
 
-                $handler = function() use ($route) {
-                    if (is_callable($route['handler'])) {
-                        return call_user_func($route['handler']);
-                    } elseif (is_array($route['handler'])) {
-                        [$controller, $method] = $route['handler'];
-                        $controllerInstance = new $controller();
-                        return call_user_func([$controllerInstance, $method]);
-                    }
-                };
-
-                foreach ($middlewares as $middleware) {
-                    $middlewareInstance = new $middleware();
-                    $middlewareInstance->handle($method, $uri, $handler);
-                    return; // Middleware handles the response
+                if (preg_match($pattern, $uri, $matches)) {
+                    array_shift($matches);
+                    $params = $matches;
+                    return $route;
                 }
-
-                // If no middleware, directly call the route handler
-                return $handler();
             }
         }
+        return null;
+    }
+
+    public function dispatch($method, $uri) {
+        $parsedUrl = parse_url($uri);
+        $path = $parsedUrl['path'] ?? $uri;
+        $query = $parsedUrl['query'] ?? '';
+    
+        $params = [];
+        parse_str($query, $params);
+        
+        $routeParams = [];
+        $route = $this->matchRoute($method, $path, $routeParams);
+
+    
+        if ($route) {
+            $handler = function() use ($route, $routeParams, $params) {
+                if (is_callable($route['handler'])) {
+                    return call_user_func_array($route['handler'], array_merge($routeParams, $params));
+                } elseif (is_array($route['handler'])) {
+                    [$controller, $method] = $route['handler'];
+                    $controllerInstance = new $controller();
+                    return call_user_func_array([$controllerInstance, $method], array_merge($routeParams, $params));
+                }
+            };
+    
+            $middlewares = $this->getMiddlewares($path);
+    
+            foreach ($middlewares as $middleware) {
+                $middlewareInstance = new $middleware();
+                $middlewareInstance->handle($method, $path, $handler);
+                return;
+            }
+    
+            return $handler();
+        }
+    
         http_response_code(404);
         echo "404 Not Found";
-    }
+    }    
 }

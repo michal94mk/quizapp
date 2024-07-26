@@ -13,13 +13,12 @@ class Question {
         $this->conn = $db->getPdo();
     }
 
-    public function getQuestionByQuizId($quizId) {
-        $query = "SELECT * FROM questions WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
+    public function getQuestionsByQuizId($quizId) {
+        $stmt = $this->conn->prepare("SELECT * FROM questions WHERE quiz_id = ?");
         $stmt->execute([$quizId]);
-        return $stmt->fetch();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-
+    
     public function createQuestion($quizId, $questionText, $questionType) {
         $query = "INSERT INTO questions (quizId, questionText, questionType) VALUES (?, ?)";
         $stmt = $this->conn->prepare($query);

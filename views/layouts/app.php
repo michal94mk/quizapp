@@ -16,7 +16,7 @@
                     <li><a href="/admin">Admin Panel</a></li>
                 <?php }; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_id']); ?> ]</a></li>
+                    <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_name']) ?> ]</a></li>
                 <?php else: ?>
                     <li><a href="/login-form">Login</a></li>
                     <li><a href="/register-form">Register</a></li>
@@ -35,6 +35,11 @@
             <?php echo htmlspecialchars($_SESSION['register_error']); ?>
             <?php unset($_SESSION['register_error']); ?>
         </div>
+    <?php elseif (isset($_SESSION['message'])): ?>
+        <div class="message error">
+            <?php echo htmlspecialchars($_SESSION['message']); ?>
+            <?php unset($_SESSION['message']); ?>
+        </div>
     <?php elseif (isset($_SESSION['login_message'])): ?>
         <div class="message success">
             <?php echo htmlspecialchars($_SESSION['login_message']); ?>
@@ -46,7 +51,6 @@
             <?php unset($_SESSION['login_error']); ?>
         </div>
     <?php endif; ?>
-    
     <!-- Additional messages using GET parameters -->
     <?php if (isset($_GET['message']) && $_GET['message'] === 'loggedout'): ?>
         <div class="message success">
