@@ -1,7 +1,7 @@
 <div class="container">
         <main class="main-content">
             <h1>Quizzes</h1>
-            <a href="add_quiz.php" class="add-btn">Add New Quiz</a>
+            <a href="/admin/add-quiz-form" class="add-btn">Add New Quiz</a>
             <table class="quizzes-table">
                 <thead>
                     <tr>
@@ -20,8 +20,11 @@
                         <td><?php echo htmlspecialchars($quiz['description']); ?></td>
                         <td><?php echo htmlspecialchars(date('Y-m-d H:i:s', strtotime($quiz['created_at']))); ?></td>
                         <td>
-                            <a href="edit_quiz.php?id=<?php echo htmlspecialchars($quiz['id']); ?>">Edit</a> |
-                            <a href="delete_quiz.php?id=<?php echo htmlspecialchars($quiz['id']); ?>" onclick="return confirm('Are you sure you want to delete this quiz?');">Delete</a>
+                        <a href="/admin/update-quiz-form/<?php echo htmlspecialchars($quiz['id']); ?>">Edit</a>
+                        <form action="/admin/delete-quiz" method="post" onsubmit="return confirm('Are you sure you want to delete this quiz?');">
+                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($quiz['id']); ?>">
+                            <input type="submit" value="Delete">
+                        </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -46,6 +46,12 @@
         </nav>
     </aside>
     <main>
+    <?php if (isset($_SESSION['message'])): ?>
+        <div class="alert">
+            <?php echo $_SESSION['message']; ?>
+            <?php unset($_SESSION['message']); ?>
+        </div>
+    <?php endif; ?>
         <div class="container">
             <?php if (isset($content) && !empty($content)): ?>
                 <?php echo $content; ?>

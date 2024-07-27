@@ -143,4 +143,83 @@ class QuizController {
             'result' => $result
         ])->render();
     }
+
+    public function addQuizForm() {
+        $view = new View(
+            PathHelper::view('admin/add_quiz.php'),
+            PathHelper::layout('admin/admin.php')
+        );
+    
+        $view->with([
+            'title' => 'Add Quiz'
+        ])->render();
+    }
+
+    public function addQuiz() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $title = $_POST['title'];
+            $description = $_POST['description'];
+            
+            $quizModel = new Quiz();
+            if ($quizModel->create($title, $description)) {
+                header("Location: /admin/quizzes");
+                exit();
+            } else {
+                echo "Błąd dodawania quizu.";
+            }
+        } else {
+            $view = new View(
+                PathHelper::view('admin/add_quiz.php'),
+                PathHelper::layout('admin/admin.php')
+            );
+            $view->with([
+                'title' => 'Add Quiz'
+            ])->render();
+        }
+    }
+
+    public function updateQuizForm($id) {
+            $quiz = new Quiz();
+            $result = $quiz->getQuizById($id);
+            $view = new View(
+                PathHelper::view('admin/update_quiz.php'),
+                PathHelper::layout('admin/admin.php')
+            );
+            $view->with([
+                'title' => 'Update Quiz',
+                'result' => $result
+            ])->render();
+        }
+
+    public function updateQuiz() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'];
+            $title = $_POST['title'];
+            $description = $_POST['description'];
+            
+            $quizModel = new Quiz();
+            if ($quizModel->update($id, $title, $description)) {
+                header("Location: /admin/quizzes");
+                exit();
+            } else {
+                echo "Błąd dodawania quizu.";
+            }
+        } else {
+            header("Location: /admin/quizzes");
+        }
+    }
+
+    public function deleteQuiz() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'];
+        $quiz = new Quiz();
+        if ($quiz->delete($id)) {
+            $_SESSION['message'] = "Udało się usunąć rekord nr $id";
+        } else {
+            $_SESSION['message'] = "Wystąpił błąd podczas usuwania rekordu nr $id";
+        }
+        header("Location: /admin/quizzes");
+        exit();
+    }
+    }
 }

@@ -12,6 +12,12 @@ $router->get('/about', [HomeController::class, 'about']);
 $router->get('/admin', [AdminController::class, 'index']);
 $router->get('/admin/quizzes', [AdminController::class, 'quizzes']);
 
+$router->post('/admin/add-quiz', [QuizController::class, 'addQuiz']);
+$router->get('/admin/add-quiz-form', [QuizController::class, 'addQuizForm']);
+$router->post('/admin/update-quiz', [QuizController::class, 'updateQuiz']);
+$router->get('/admin/update-quiz-form/{id}', [QuizController::class, 'updateQuizForm']);
+$router->post('/admin/delete-quiz', [QuizController::class, 'deleteQuiz']);
+
 $router->get('/register-form', [AuthController::class, 'showRegisterForm']);
 $router->post('/register', [AuthController::class, 'register']);
 $router->get('/login-form', [AuthController::class, 'showLoginForm']);
