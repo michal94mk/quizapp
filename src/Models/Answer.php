@@ -7,38 +7,43 @@ use App\Database\Database;
 class Answer {
     private $conn;
 
-    public $id;
-    public $question_id;
-    public $answer_id;
-    public $is_correct;
-
     public function __construct() {
         $db = new Database();
         $this->conn = $db->getPdo();
     }
 
-    public function getAnswerById($answerId) {
-        $query = "SELECT * FROM answers WHERE id = :id";
+    public function create($questionId, $answerText, $isCorrect) {
+        $query = "INSERT INTO answers (question_id, answer_text, is_correct) VALUES (:question_id, :answer_text, :is_correct)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $answerId, \PDO::PARAM_INT);
+        $stmt->bindParam(':question_id', $questionId, \PDO::PARAM_INT);
+        $stmt->bindParam(':answer_text', $answerText, \PDO::PARAM_STR);
+        $stmt->bindParam(':is_correct', $isCorrect, \PDO::PARAM_INT);
         $stmt->execute();
-    
-        $answer = $stmt->fetch(\PDO::FETCH_ASSOC);
-   
-        return $answer;
-    }
-    
-    public function getAnswersByQuestionId($questionId) {
-        $query = "SELECT * FROM answers WHERE question_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute([$questionId]);
-        return $stmt->fetchAll();
+        return $this->conn->lastInsertId();
     }
 
-    public function createAnswer($questionId, $answerText, $isCorrect) {
-        $query = "INSERT INTO answers (question_id, answer_text, is_correct) VALUES (?, ?, ?)";
+    public function update($id, $answerText, $isCorrect) {
+        $query = "UPDATE answers SET answer_text = :answer_text, is_correct = :is_correct WHERE id = :id";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([$questionId, $answerText, $isCorrect]);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $stmt->bindParam(':answer_text', $answerText, \PDO::PARAM_STR);
+        $stmt->bindParam(':is_correct', $isCorrect, \PDO::PARAM_BOOL);
+        return $stmt->execute();
+    }
+
+    public function delete($id) {
+        $query = "DELETE FROM answers WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function getAnswersByQuestionId($questionId) {
+        $query = "SELECT * FROM answers WHERE question_id = :question_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':question_id', $questionId, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function find($id) {
@@ -48,5 +53,4 @@ class Answer {
         $stmt->execute();
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
-    
 }

@@ -22,6 +22,14 @@ class Router {
         ];
     }
 
+    public function paginate($route, $controllerClass, $methodName) {
+        $this->get($route, function() use ($controllerClass, $methodName) {
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $controller = new $controllerClass();
+            $controller->$methodName($page);
+        });
+    }
+
     public function middlewareGroup($groupName, $middlewareArray) {
         $this->middlewareGroups[$groupName] = $middlewareArray;
     }

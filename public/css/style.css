@@ -45,7 +45,7 @@ nav ul li a:hover {
 /* Main section styling */
 main {
     padding: 20px;
-    max-width: 1200px;
+    max-width: 70%;
     margin: auto;
     background: #fff;
     border-radius: 8px;
@@ -93,6 +93,27 @@ footer {
 .quiz-description {
     color: #555;
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
 
 /* Styles for messages */
 .message-container {
@@ -257,7 +278,11 @@ footer {
 
 .container {
     display: flex;
-    max-width: 1200px;
+    flex-direction: column; /* Ustawienie kierunku wierszy */
+    justify-content: center; /* Wyrównanie elementów w poziomie */
+    align-items: center; /* Wyrównanie elementów w pionie */
+    height: auto; 
+    max-width: 70%;
     margin: 20px auto;
     padding: 0 20px;
 }
@@ -303,6 +328,35 @@ footer {
 
 .recent-activity ul li {
     margin: 10px 0;
+}
+
+.quizzes-table {
+    border: 1px solid;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.quizzes-table th, td {
+    border: 1px solid;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.add-btn {
+    background-color: green;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-btn::hover {
+    background-color: green;
+    padding: 5px;
+    border-radius: 5px;
+    scale: 1.03
 }
 /* /Admin */
 

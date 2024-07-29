@@ -7,13 +7,17 @@ use App\Models\Question;
 use App\Models\Answer;
 use App\Models\UserAnswer;
 use App\Models\UserQuizResult;
-use App\Helper\PathHelper;
 use App\View\View;
+use App\Helper\PathHelper;
 
 class QuizController {
-    public function showAllQuizzes() {
-        $quizModel = new Quiz();
-        $quizzes = $quizModel->getAllQuizzes();
+    public function showAllQuizzes($page = 1) {
+            $quizModel = new Quiz();
+            $quizzesPerPage = 10;
+            $offset = ($page - 1) * $quizzesPerPage;
+            $quizzes = $quizModel->getAllQuizzes($quizzesPerPage, $offset);
+            $totalQuizzes = $quizModel->getQuizCount();
+            $totalPages = ceil($totalQuizzes / $quizzesPerPage);
 
         $view = new View(
             PathHelper::view('quizzes.php'),
@@ -21,8 +25,10 @@ class QuizController {
         );
 
         $view->with([
-            'title' => 'Quizzes',
-            'quizzes' => $quizzes
+            'title' => 'List of Quizzes',
+            'quizzes' => $quizzes,
+            'currentPage' => $page,
+            'totalPages' => $totalPages
         ])->render();
     }
 
@@ -60,7 +66,25 @@ class QuizController {
             'questions' => $questions
         ])->render();
     }
+
+    public function showQuizResult($quiz_id) {
+        $user_id = $_SESSION['user_id'];
     
+        $userQuizResult = new UserQuizResult();
+        $result = $userQuizResult->getResult($user_id, $quiz_id);
+    
+        $view = new View(
+            PathHelper::view('quiz_result.php'),
+            PathHelper::layout('app.php')
+        );
+    
+        $view->with([
+            'title' => 'Quiz Result',
+            'result' => $result
+        ])->render();
+    }
+
+
     public function submitQuiz() {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['message'] = 'Aby wysłać quiz musisz się zalogować';
@@ -126,32 +150,15 @@ class QuizController {
         header("Location: /quiz-result/$quiz_id");
         exit();
     }
-    
-    public function showQuizResult($quiz_id) {
-        $user_id = $_SESSION['user_id'];
-    
-        $userQuizResult = new UserQuizResult();
-        $result = $userQuizResult->getResult($user_id, $quiz_id);
-    
-        $view = new View(
-            PathHelper::view('quiz_result.php'),
-            PathHelper::layout('app.php')
-        );
-    
-        $view->with([
-            'title' => 'Quiz Result',
-            'result' => $result
-        ])->render();
-    }
 
     public function addQuizForm() {
         $view = new View(
-            PathHelper::view('admin/add_quiz.php'),
+            PathHelper::view('admin/add_quiz_with_questions.php'),
             PathHelper::layout('admin/admin.php')
         );
-    
+
         $view->with([
-            'title' => 'Add Quiz'
+            'title' => 'Add Quiz with Questions'
         ])->render();
     }
 
@@ -159,67 +166,115 @@ class QuizController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = $_POST['title'];
             $description = $_POST['description'];
-            
+            $questions = $_POST['questions'] ?? [];
+    
             $quizModel = new Quiz();
-            if ($quizModel->create($title, $description)) {
-                header("Location: /admin/quizzes");
-                exit();
-            } else {
-                echo "Błąd dodawania quizu.";
+    
+            try {
+                $quizId = $quizModel->create($title, $description, $questions);
+    
+                if ($quizId) {
+                    $questionModel = new Question();
+                    $answerModel = new Answer();
+    
+                    foreach ($questions as $question) {
+                        $questionText = $question['question_text'];
+                        $questionType = $question['question_type'];
+                        $questionId = $questionModel->create($quizId, $questionText, $questionType);
+    
+                        if ($questionId) {
+                            foreach ($question['answers'] as $answer) {
+                                $answerText = $answer['answer_text'];
+                                $isCorrect = isset($answer['is_correct']) ? 1 : 0;
+                                $answerModel->create($questionId, $answerText, $isCorrect);
+                            }
+                        } else {
+                            throw new \Exception("Failed to create question: " . print_r($question, true));
+                        }
+                    }
+    
+                    header("Location: /admin/quizzes");
+                    exit();
+                } else {
+                    throw new \Exception("Failed to create quiz: " . print_r(['title' => $title, 'description' => $description], true));
+                }
+            } catch (\Exception $e) {
+                echo "Error adding quiz: " . $e->getMessage();
             }
-        } else {
-            $view = new View(
-                PathHelper::view('admin/add_quiz.php'),
-                PathHelper::layout('admin/admin.php')
-            );
-            $view->with([
-                'title' => 'Add Quiz'
-            ])->render();
         }
     }
+    
 
     public function updateQuizForm($id) {
-            $quiz = new Quiz();
-            $result = $quiz->getQuizById($id);
-            $view = new View(
-                PathHelper::view('admin/update_quiz.php'),
-                PathHelper::layout('admin/admin.php')
-            );
-            $view->with([
-                'title' => 'Update Quiz',
-                'result' => $result
-            ])->render();
+        $quizModel = new Quiz();
+        $questionModel = new Question();
+        $answerModel = new Answer();
+
+        $quiz = $quizModel->getQuizById($id);
+        $questions = $questionModel->getQuestionsByQuizId($id);
+
+        foreach ($questions as $index => $question) {
+            $questions[$index]['answers'] = $answerModel->getAnswersByQuestionId($question['id']);
         }
+
+        $view = new View(
+            PathHelper::view('admin/update_quiz_with_questions.php'),
+            PathHelper::layout('admin/admin.php')
+        );
+
+        $view->with([
+            'title' => 'Edit Quiz',
+            'quiz' => $quiz,
+            'questions' => $questions
+        ])->render();
+    }
 
     public function updateQuiz() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
             $title = $_POST['title'];
             $description = $_POST['description'];
-            
+            $questions = $_POST['questions'] ?? [];
+
             $quizModel = new Quiz();
+            $questionModel = new Question();
+            $answerModel = new Answer();
+
             if ($quizModel->update($id, $title, $description)) {
+                foreach ($questions as $question) {
+                    $questionId = $question['id'];
+                    $questionText = $question['question_text'];
+                    $questionType = $question['question_type'];
+                    $questionModel->update($questionId, $questionText, $questionType);
+
+                    foreach ($question['answers'] as $answer) {
+                        $answerId = $answer['id'];
+                        $answerText = $answer['answer_text'];
+                        $isCorrect = isset($answer['is_correct']) ? 1 : 0;
+                        $answerModel->update($answerId, $answerText, $isCorrect);
+                    }
+                }
+
                 header("Location: /admin/quizzes");
                 exit();
             } else {
-                echo "Błąd dodawania quizu.";
+                echo "Error updating quiz.";
             }
-        } else {
-            header("Location: /admin/quizzes");
         }
     }
 
     public function deleteQuiz() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];
-        $quiz = new Quiz();
-        if ($quiz->delete($id)) {
-            $_SESSION['message'] = "Udało się usunąć rekord nr $id";
-        } else {
-            $_SESSION['message'] = "Wystąpił błąd podczas usuwania rekordu nr $id";
+
+            $quizModel = new Quiz();
+            if ($quizModel->delete($id)) {
+                echo "Successfully deleted quiz ID: " . htmlspecialchars($id);
+                header("Location: /admin/quizzes");
+                exit();
+            } else {
+                echo "Error deleting quiz.";
+            }
         }
-        header("Location: /admin/quizzes");
-        exit();
-    }
     }
 }

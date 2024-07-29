@@ -5,9 +5,10 @@ namespace App\Controllers;
 use App\View\View;
 use App\Helper\PathHelper;
 use App\Models\Quiz;
+use App\Models\Question;
+
 
 class AdminController {
-
     public function index() {
         $view = new View(
             PathHelper::layout('admin/admin.php')
@@ -18,9 +19,13 @@ class AdminController {
         ])->render();
     }
 
-    public function quizzes() {
+    public function quizzes($page) {
         $quizModel = new Quiz();
-        $quizzes = $quizModel->getAllQuizzes();
+        $quizzesPerPage = 10;
+        $offset = ($page - 1) * $quizzesPerPage;
+        $quizzes = $quizModel->getAllQuizzes($quizzesPerPage, $offset);
+        $totalQuizzes = $quizModel->getQuizCount();
+        $totalPages = ceil($totalQuizzes / $quizzesPerPage);
 
         $view = new View(
             PathHelper::view('admin/quizzes.php'),
@@ -28,8 +33,10 @@ class AdminController {
         );
 
         $view->with([
-            'title' => 'Quizzes',
-            'quizzes' => $quizzes
+            'title' => 'List of Quizzes',
+            'quizzes' => $quizzes,
+            'currentPage' => $page,
+            'totalPages' => $totalPages
         ])->render();
     }
 }
