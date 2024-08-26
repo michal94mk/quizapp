@@ -13,7 +13,7 @@ use App\Helper\PathHelper;
 class QuizController {
     public function showAllQuizzes($page = 1) {
             $quizModel = new Quiz();
-            $quizzesPerPage = 10;
+            $quizzesPerPage = 9;
             $offset = ($page - 1) * $quizzesPerPage;
             $quizzes = $quizModel->getAllQuizzes($quizzesPerPage, $offset);
             $totalQuizzes = $quizModel->getQuizCount();
@@ -186,23 +186,26 @@ class QuizController {
                             foreach ($question['answers'] as $answer) {
                                 $answerText = $answer['answer_text'];
                                 $isCorrect = isset($answer['is_correct']) ? 1 : 0;
-                                $answerModel->create($questionId, $answerText, $isCorrect);
+                                $answerCreated = $answerModel->create($questionId, $answerText, $isCorrect);
+    
+                                if (!$answerCreated) {
+                                    error_log("Failed to create answer: " . print_r($answer, true)); // Logowanie błędów
+                                }
                             }
                         } else {
-                            throw new \Exception("Failed to create question: " . print_r($question, true));
+                            error_log("Failed to create question: " . print_r($question, true)); // Logowanie błędów
                         }
                     }
-    
-                    header("Location: /admin/quizzes");
-                    exit();
                 } else {
-                    throw new \Exception("Failed to create quiz: " . print_r(['title' => $title, 'description' => $description], true));
+                    error_log("Failed to create quiz: " . print_r(['title' => $title, 'description' => $description], true));
                 }
             } catch (\Exception $e) {
-                echo "Error adding quiz: " . $e->getMessage();
+                error_log("Error adding quiz: " . $e->getMessage());
+                error_log($e->getTraceAsString());
             }
         }
     }
+    
     
 
     public function updateQuizForm($id) {

@@ -99,5 +99,11 @@ class User {
         } else {
             return 'Invalid username or password.';
         }
-    }    
+    }
+    
+    public function getUserCount() {
+        $query = "SELECT COUNT(*) FROM users";
+        $stmt = $this->conn->query($query);
+        return $stmt->fetchColumn();
+    }
 }

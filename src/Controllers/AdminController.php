@@ -6,22 +6,38 @@ use App\View\View;
 use App\Helper\PathHelper;
 use App\Models\Quiz;
 use App\Models\Question;
+use App\Models\User;
 
 
 class AdminController {
     public function index() {
+        $userModel = new User();
+        $totalUsers = $userModel->getUserCount();
+
+        $quizModel = new Quiz();
+        $totalQuizzes = $quizModel->getQuizCount();
+
+        $questionModel = new Question();
+        $totalQuestions = $questionModel->getQuestionCount();
+
+        $recentQuizzes = $quizModel->getRecentQuizzes(5);
+
         $view = new View(
+            PathHelper::view('admin/dashboard.php'),
             PathHelper::layout('admin/admin.php')
         );
 
         $view->with([
-            'title' => 'Admin Page',
+            'totalUsers' => $totalUsers,
+            'totalQuizzes' => $totalQuizzes,
+            'totalQuestions' => $totalQuestions,
+            'recentQuizzes' => $recentQuizzes
         ])->render();
     }
 
     public function quizzes($page) {
         $quizModel = new Quiz();
-        $quizzesPerPage = 10;
+        $quizzesPerPage = 12;
         $offset = ($page - 1) * $quizzesPerPage;
         $quizzes = $quizModel->getAllQuizzes($quizzesPerPage, $offset);
         $totalQuizzes = $quizModel->getQuizCount();

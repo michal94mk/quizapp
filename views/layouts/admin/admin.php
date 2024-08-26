@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="/public/css/style.css">
 </head>
 <body>
-    <header>
-        <div class="navbar">
-            <div class="logo">Admin Panel</div>
+        <div class="toggle-btn-container">
             <button class="toggle-btn" id="toggle-btn">
                 <div class="hamburger-icon">
                     <div class="bar"></div>
@@ -18,14 +16,14 @@
                 </div>
             </button>
         </div>
-    </header>
     <nav class="horizontal-nav">
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/admin">Dashboard</a></li>
-            <li><a href="/admin/quizzes">Quizzes</a></li>
-            <li><a href="/admin/users">Users</a></li>
-            <li><a href="statistics.php">Stats</a></li>
+            <li class="admin-panel-label">Admin Panel</li>
+            <li><a href="/" class="<?= ($_SERVER['REQUEST_URI'] == '/') ? 'active' : '' ?>">Home</a></li>
+            <li><a href="/admin" class="<?= ($_SERVER['REQUEST_URI'] == '/admin') ? 'active' : '' ?>">Dashboard</a></li>
+            <li><a href="/admin/quizzes" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/quizzes') ? 'active' : '' ?>">Quizzes</a></li>
+            <li><a href="/admin/users" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/users') ? 'active' : '' ?>">Users</a></li>
+            <li><a href="/admin/stats" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/stats') ? 'active' : '' ?>">Stats</a></li>
             <?php if (isset($_SESSION['user_id'])) { ?>
                 <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_name']); ?> ]</a></li>
             <?php }; ?>
@@ -40,7 +38,7 @@
                 <li><a href="/admin/users">Users</a></li>
                 <li><a href="statistics.php">Stats</a></li>
                 <?php if (isset($_SESSION['user_id'])) { ?>
-                    <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_id']); ?> ]</a></li>
+                    <li><a href="/logout">Logout [ <?php echo htmlspecialchars($_SESSION['user_name']); ?> ]</a></li>
                 <?php }; ?>
             </ul>
         </nav>
@@ -59,7 +57,25 @@
                 <p>No content available.</p>
             <?php endif; ?>
         </div>
+        <?php if (isset($currentPage)): ?>
+            <div class="pagination">
+                <?php if ($currentPage > 1): ?>
+                    <a href="/admin/quizzes?page=<?php echo $currentPage - 1; ?>">&laquo; Previous</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="/admin/quizzes?page=<?php echo $i; ?>"<?php if ($i == $currentPage) echo ' class="active"'; ?>><?php echo $i; ?></a>
+                <?php endfor; ?>
+
+                <?php if ($currentPage < $totalPages): ?>
+                    <a href="/admin/quizzes?page=<?php echo $currentPage + 1; ?>">Next &raquo;</a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </main>
+    <footer>
+        <p>Footer content here</p>
+    </footer>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
     $(document).ready(function() {
@@ -67,7 +83,12 @@
             $('#sidebar').toggleClass('active');
         });
 
-        // Custom script for form handling (if needed)
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('#sidebar').length && !$(event.target).closest('#toggle-btn').length) {
+            $('#sidebar').removeClass('active');
+        }
+    });
+
         let questionIndex = 1;
         let answerIndex = 1;
 

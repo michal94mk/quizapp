@@ -1,14 +1,9 @@
-    <h1>Register</h1>
-    <form action="/register" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required>
-        <br>
-        <input type="submit" value="Register">
+<div class="register-wrapper">
+    <form class="register-form" action="/register" method="POST">
+        <input type="text" name="username" placeholder="Username" id="username" required>
+        <input type="password" name="password" placeholder="Password" id="password" required>
+        <input type="email" name="email" placeholder="Email" id="email" required>
+        <button class="register-btn" type="submit">Register</button>
     </form>
     <?php if (isset($message)) echo "<p>$message</p>"; ?>
+</div>

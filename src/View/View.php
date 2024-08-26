@@ -18,22 +18,22 @@ class View {
     }
 
     private function renderView() {
-        extract($this->data); // Extracts data array to variables
-        ob_start(); // Start output buffering
+        extract($this->data);
+        ob_start();
         include $this->viewPath;
-        return ob_get_clean(); // Get buffered content
+        return ob_get_clean();
     }
 
     public function render() {
-        $content = $this->renderView(); // Prepare the content of the view
-        $layoutData = $this->data;        // Prepare data for layout scope
+        $content = $this->renderView();
+        $layoutData = $this->data;
         $layoutData['content'] = $content;
 
         if ($this->layoutPath) {
-            extract($layoutData); // Extract data array to variables for layout
-            include $this->layoutPath; // Include the layout file
+            extract($layoutData);
+            include $this->layoutPath;
         } else {
-            echo $content; // Output content directly if no layout is provided
+            echo $content;
         }
     }
 }

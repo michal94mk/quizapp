@@ -83,7 +83,16 @@ class Quiz {
     }
 
     public function getQuizCount() {
-        $stmt = $this->conn->query("SELECT COUNT(*) as count FROM quizzes");
+        $query = "SELECT COUNT(*) as count FROM quizzes";
+        $stmt = $this->conn->query($query);
         return $stmt->fetch(\PDO::FETCH_ASSOC)['count'];
+    }
+
+    public function getRecentQuizzes($limit = 5) {
+        $query = "SELECT * FROM quizzes ORDER BY created_at DESC LIMIT :limit";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

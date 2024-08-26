@@ -45,4 +45,10 @@ class Question {
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function getQuestionCount() {
+        $query = "SELECT COUNT(*) FROM questions";
+        $stmt = $this->conn->query($query);
+        return $stmt->fetchColumn();
+    }
 }

@@ -26,6 +26,22 @@ class AuthController {
         unset($_SESSION['register_success']);
     }
 
+    public function showLoginForm() {
+        if (isset($_SESSION['user_id'])) {
+            header('Location: /');
+            exit();
+        }
+
+        $view = new View(
+            PathHelper::view('login.php'),
+            PathHelper::layout('app.php')
+        );
+        
+        $view->with([
+            'title' => 'Login'
+        ])->render();
+    }
+
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
@@ -51,19 +67,6 @@ class AuthController {
             http_response_code(405);
             echo "Method Not Allowed";
         }
-    }
-
-    public function showLoginForm() {
-        if (isset($_SESSION['user_id'])) {
-            header('Location: /');
-            exit();
-        }
-
-        $view = new View(
-            PathHelper::view('login.php'),
-            PathHelper::layout('app.php')
-        );
-        $view->render();
     }
 
     public function login() {
