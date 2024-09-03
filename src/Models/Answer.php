@@ -27,7 +27,7 @@ class Answer {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
         $stmt->bindParam(':answer_text', $answerText, \PDO::PARAM_STR);
-        $stmt->bindParam(':is_correct', $isCorrect, \PDO::PARAM_BOOL);
+        $stmt->bindValue(':is_correct', $isCorrect ? 1 : 0, \PDO::PARAM_INT);
         return $stmt->execute();
     }
 
@@ -36,6 +36,14 @@ class Answer {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
         return $stmt->execute();
+    }
+
+    public function getAnswerById($id) {
+        $query = "SELECT * FROM answers WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public function getAnswersByQuestionId($questionId) {

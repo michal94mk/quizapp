@@ -39,7 +39,7 @@ class AdminController {
         $quizModel = new Quiz();
         $quizzesPerPage = 12;
         $offset = ($page - 1) * $quizzesPerPage;
-        $quizzes = $quizModel->getAllQuizzes($quizzesPerPage, $offset);
+        $quizzes = $quizModel->getAllQuizzesPaginated($quizzesPerPage, $offset);
         $totalQuizzes = $quizModel->getQuizCount();
         $totalPages = ceil($totalQuizzes / $quizzesPerPage);
 

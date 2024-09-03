@@ -12,41 +12,13 @@ class Quiz {
         $this->conn = $db->getPdo();
     }
 
-    public function create($title, $description, $questions)
+    public function create($title, $description)
     {
-        try {
             $query = "INSERT INTO quizzes (title, description) VALUES (:title, :description)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':title', $title, \PDO::PARAM_STR);
             $stmt->bindParam(':description', $description, \PDO::PARAM_STR);
-            $stmt->execute();
-
-            $quiz_id = $this->conn->lastInsertId();
-
-            foreach ($questions as $question) {
-                $query = "INSERT INTO questions (quiz_id, question_text, question_type) VALUES (:quiz_id, :question_text, :question_type)";
-                $stmt = $this->conn->prepare($query);
-                $stmt->bindParam(':quiz_id', $quiz_id, \PDO::PARAM_INT);
-                $stmt->bindParam(':question_text', $question['question_text'], \PDO::PARAM_STR);
-                $stmt->bindParam(':question_type', $question['question_type'], \PDO::PARAM_STR);
-                $stmt->execute();
-
-                $question_id = $this->conn->lastInsertId();
-
-                foreach ($question['answers'] as $answer) {
-                    $query = "INSERT INTO answers (question_id, answer_text, is_correct) VALUES (:question_id, :answer_text, :is_correct)";
-                    $stmt = $this->conn->prepare($query);
-                    $stmt->bindParam(':question_id', $question_id, \PDO::PARAM_INT);
-                    $stmt->bindParam(':answer_text', $answer['answer_text'], \PDO::PARAM_STR);
-                    $stmt->bindParam(':is_correct', $answer['is_correct'], \PDO::PARAM_BOOL);
-                    $stmt->execute();
-                }
-            }
-
-            return $quiz_id;
-        } catch (\Exception $e) {
-            return false;
-        }
+            return $stmt->execute();
     }
 
     public function update($id, $title, $description) {
@@ -73,11 +45,37 @@ class Quiz {
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    public function getAllQuizzes($limit, $offset) {
-        $query = "SELECT * FROM quizzes LIMIT :limit OFFSET :offset";
+public function getAllQuizzesPaginated($limit, $offset) {
+    $query = "
+        SELECT 
+            q.id AS quiz_id,
+            q.title AS quiz_title,
+            q.description AS quiz_description,
+            q.created_at AS quiz_created_at,
+            COUNT(qu.id) AS question_count
+        FROM 
+            quizzes q
+        LEFT JOIN 
+            questions qu ON q.id = qu.quiz_id
+        GROUP BY 
+            q.id, q.title, q.description, q.created_at
+        LIMIT 
+            :limit 
+        OFFSET 
+            :offset
+    ";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+    $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+
+
+    public function getAllQuizzesTitles() {
+        $query = "SELECT * FROM quizzes";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

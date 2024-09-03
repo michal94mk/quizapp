@@ -18,19 +18,24 @@
         </div>
         <nav class="horizontal-nav">
     <ul>
-        <li><a href="/" class="<?= ($_SERVER['REQUEST_URI'] == '/') ? 'active' : '' ?>">Home</a></li>
-        <li><a href="/about" class="<?= ($_SERVER['REQUEST_URI'] == '/about') ? 'active' : '' ?>">About</a></li>
+        <?php
+        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        ?>
+        <li><a href="/" class="<?= ($currentPath == '/') ? 'active' : '' ?>">Home</a></li>
+        <li><a href="/about" class="<?= ($currentPath == '/about') ? 'active' : '' ?>">About</a></li>
         <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') { ?>
-            <li><a href="/admin" class="<?= ($_SERVER['REQUEST_URI'] == '/admin') ? 'active' : '' ?>">Admin Panel</a></li>
+            <li><a href="/admin" class="<?= ($currentPath == '/admin') ? 'active' : '' ?>">Admin Panel</a></li>
         <?php } ?>
         <?php if (isset($_SESSION['user_id'])): ?>
-            <li><a href="/logout" class="<?= ($_SERVER['REQUEST_URI'] == '/logout') ? 'active' : '' ?>">Logout [ <?= htmlspecialchars($_SESSION['user_name']) ?> ]</a></li>
+            <li><a href="/logout" class="<?= ($currentPath == '/logout') ? 'active' : '' ?>">Logout [ <?= htmlspecialchars($_SESSION['user_name']) ?> ]</a></li>
         <?php else: ?>
-            <li><a href="/login-form" class="<?= ($_SERVER['REQUEST_URI'] == '/login-form') ? 'active' : '' ?>">Login</a></li>
-            <li><a href="/register-form" class="<?= ($_SERVER['REQUEST_URI'] == '/register-form') ? 'active' : '' ?>">Register</a></li>
+            <li><a href="/login-form" class="<?= ($currentPath == '/login-form') ? 'active' : '' ?>">Login</a></li>
+            <li><a href="/register-form" class="<?= ($currentPath == '/register-form') ? 'active' : '' ?>">Register</a></li>
         <?php endif; ?>
     </ul>
 </nav>
+
+
 
     <aside class="sidebar" id="sidebar">
         <nav>

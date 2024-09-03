@@ -22,6 +22,7 @@
             <li><a href="/" class="<?= ($_SERVER['REQUEST_URI'] == '/') ? 'active' : '' ?>">Home</a></li>
             <li><a href="/admin" class="<?= ($_SERVER['REQUEST_URI'] == '/admin') ? 'active' : '' ?>">Dashboard</a></li>
             <li><a href="/admin/quizzes" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/quizzes') ? 'active' : '' ?>">Quizzes</a></li>
+            <li><a href="/admin/questions" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/questions') ? 'active' : '' ?>">Questions</a></li>
             <li><a href="/admin/users" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/users') ? 'active' : '' ?>">Users</a></li>
             <li><a href="/admin/stats" class="<?= ($_SERVER['REQUEST_URI'] == '/admin/stats') ? 'active' : '' ?>">Stats</a></li>
             <?php if (isset($_SESSION['user_id'])) { ?>
@@ -43,36 +44,21 @@
             </ul>
         </nav>
     </aside>
-    <main>
-    <?php if (isset($_SESSION['message'])): ?>
-        <div class="alert">
-            <?php echo $_SESSION['message']; ?>
-            <?php unset($_SESSION['message']); ?>
-        </div>
-    <?php endif; ?>
-        <div class="container">
+    <div class="admin-main">
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class="alert">
+                <?php echo $_SESSION['message']; ?>
+                <?php unset($_SESSION['message']); ?>
+            </div>
+        <?php endif; ?>
+        <div class="admin-container">
             <?php if (isset($content) && !empty($content)): ?>
                 <?php echo $content; ?>
             <?php else: ?>
                 <p>No content available.</p>
             <?php endif; ?>
-        </div>
-        <?php if (isset($currentPage)): ?>
-            <div class="pagination">
-                <?php if ($currentPage > 1): ?>
-                    <a href="/admin/quizzes?page=<?php echo $currentPage - 1; ?>">&laquo; Previous</a>
-                <?php endif; ?>
-
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="/admin/quizzes?page=<?php echo $i; ?>"<?php if ($i == $currentPage) echo ' class="active"'; ?>><?php echo $i; ?></a>
-                <?php endfor; ?>
-
-                <?php if ($currentPage < $totalPages): ?>
-                    <a href="/admin/quizzes?page=<?php echo $currentPage + 1; ?>">Next &raquo;</a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-    </main>
+        </div>       
+    </div>
     <footer>
         <p>Footer content here</p>
     </footer>

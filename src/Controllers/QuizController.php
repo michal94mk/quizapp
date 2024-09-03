@@ -15,7 +15,7 @@ class QuizController {
             $quizModel = new Quiz();
             $quizzesPerPage = 9;
             $offset = ($page - 1) * $quizzesPerPage;
-            $quizzes = $quizModel->getAllQuizzes($quizzesPerPage, $offset);
+            $quizzes = $quizModel->getAllQuizzesPaginated($quizzesPerPage, $offset);
             $totalQuizzes = $quizModel->getQuizCount();
             $totalPages = ceil($totalQuizzes / $quizzesPerPage);
 
@@ -67,11 +67,11 @@ class QuizController {
         ])->render();
     }
 
-    public function showQuizResult($quiz_id) {
+    public function showQuizResult($id) {
         $user_id = $_SESSION['user_id'];
     
         $userQuizResult = new UserQuizResult();
-        $result = $userQuizResult->getResult($user_id, $quiz_id);
+        $result = $userQuizResult->getResult($user_id, $id);
     
         $view = new View(
             PathHelper::view('quiz_result.php'),
@@ -153,12 +153,12 @@ class QuizController {
 
     public function addQuizForm() {
         $view = new View(
-            PathHelper::view('admin/add_quiz_with_questions.php'),
+            PathHelper::view('admin/add_quiz.php'),
             PathHelper::layout('admin/admin.php')
         );
 
         $view->with([
-            'title' => 'Add Quiz with Questions'
+            'title' => 'Add Quiz'
         ])->render();
     }
 
@@ -166,48 +166,13 @@ class QuizController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = $_POST['title'];
             $description = $_POST['description'];
-            $questions = $_POST['questions'] ?? [];
-    
             $quizModel = new Quiz();
-    
-            try {
-                $quizId = $quizModel->create($title, $description, $questions);
-    
-                if ($quizId) {
-                    $questionModel = new Question();
-                    $answerModel = new Answer();
-    
-                    foreach ($questions as $question) {
-                        $questionText = $question['question_text'];
-                        $questionType = $question['question_type'];
-                        $questionId = $questionModel->create($quizId, $questionText, $questionType);
-    
-                        if ($questionId) {
-                            foreach ($question['answers'] as $answer) {
-                                $answerText = $answer['answer_text'];
-                                $isCorrect = isset($answer['is_correct']) ? 1 : 0;
-                                $answerCreated = $answerModel->create($questionId, $answerText, $isCorrect);
-    
-                                if (!$answerCreated) {
-                                    error_log("Failed to create answer: " . print_r($answer, true)); // Logowanie błędów
-                                }
-                            }
-                        } else {
-                            error_log("Failed to create question: " . print_r($question, true)); // Logowanie błędów
-                        }
-                    }
-                } else {
-                    error_log("Failed to create quiz: " . print_r(['title' => $title, 'description' => $description], true));
-                }
-            } catch (\Exception $e) {
-                error_log("Error adding quiz: " . $e->getMessage());
-                error_log($e->getTraceAsString());
-            }
+            $quizModel->create($title, $description);
         }
+
+        header('Location: /admin/quizzes');
     }
     
-    
-
     public function updateQuizForm($id) {
         $quizModel = new Quiz();
         $questionModel = new Question();
@@ -230,40 +195,6 @@ class QuizController {
             'quiz' => $quiz,
             'questions' => $questions
         ])->render();
-    }
-
-    public function updateQuiz() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
-            $title = $_POST['title'];
-            $description = $_POST['description'];
-            $questions = $_POST['questions'] ?? [];
-
-            $quizModel = new Quiz();
-            $questionModel = new Question();
-            $answerModel = new Answer();
-
-            if ($quizModel->update($id, $title, $description)) {
-                foreach ($questions as $question) {
-                    $questionId = $question['id'];
-                    $questionText = $question['question_text'];
-                    $questionType = $question['question_type'];
-                    $questionModel->update($questionId, $questionText, $questionType);
-
-                    foreach ($question['answers'] as $answer) {
-                        $answerId = $answer['id'];
-                        $answerText = $answer['answer_text'];
-                        $isCorrect = isset($answer['is_correct']) ? 1 : 0;
-                        $answerModel->update($answerId, $answerText, $isCorrect);
-                    }
-                }
-
-                header("Location: /admin/quizzes");
-                exit();
-            } else {
-                echo "Error updating quiz.";
-            }
-        }
     }
 
     public function deleteQuiz() {

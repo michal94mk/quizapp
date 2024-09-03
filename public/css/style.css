@@ -337,6 +337,32 @@ input[type="checkbox"] {
 
 
 /* Stylowanie panelu admina */
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: auto;
+    margin-bottom: 45px;
+    background-color: #fff;
+    min-height: 90vh;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 70%;
+    margin: auto;
+    padding: 0;
+}
+
 .main-content {
     flex-grow: 1;
     background-color: #fff;
@@ -381,15 +407,15 @@ input[type="checkbox"] {
 }
 
 .quizzes-table-container {
-    max-width: 800px;
-    max-height: 600px;
+    width: 100%;
+    height: 600px;
     padding: 20px;
     overflow: hidden;
 
 }
 
 .quizzes-table {
-    max-width: 780px;
+    width: 100%;
     max-height: 580px;
     border: 1px solid;
     margin-top: 10px;
@@ -427,6 +453,56 @@ input[type="checkbox"] {
 
 .quizzes-table td:nth-child(4) {
     width: 200px;
+    text-align: center;
+}
+
+.questions-table-container {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    overflow: hidden;
+
+}
+
+.questions-table {
+    width: 100%;
+    height: 100%;
+    border: 1px solid;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 2px;
+    justify-content: center;
+    align-items: center;
+}
+
+.questions-table th, td {
+    border: 1px solid;
+    height: 40px;
+    padding: 2px;
+    border-radius: 2px;
+}
+
+
+.questions-table td:nth-child(1) {
+    width: auto;
+    text-align: center;
+}
+
+.questions-table td:nth-child(2) {
+    width: auto;
+    text-align: center;
+}
+
+.questions-table td:nth-child(3) {
+    max-width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.questions-table td:nth-child(4) {
+    width: auto;
     text-align: center;
 }
 
@@ -615,7 +691,7 @@ input[type="checkbox"] {
 }
 /* ----------------------- */
 
-/* Formularz logowania */
+/* Formularz rejestracji */
 #username {
     width: 250px;
     border: 1px solid;

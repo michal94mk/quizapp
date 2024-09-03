@@ -5,6 +5,7 @@ use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\QuizController;
 use App\Controllers\QuestionController;
+use App\Controllers\AnswerController;
 use App\Middlewares\AdminMiddleware;
 
 $router->get('/about', [HomeController::class, 'about']);
@@ -17,6 +18,20 @@ $router->get('/admin/update-quiz-form/{id}', [QuizController::class, 'updateQuiz
 $router->post('/admin/update-quiz', [QuizController::class, 'updateQuiz']);
 $router->post('/admin/delete-quiz', [QuizController::class, 'deleteQuiz']);
 
+$router->paginate('/admin/questions', QuestionController::class, 'showAllQuestions');
+$router->get('/admin/add-question-form', [QuestionController::class, 'addQuestionForm']);
+$router->post('/admin/add-question', [QuestionController::class, 'addQuestion']);
+$router->get('/admin/update-question-form/{id}', [QuestionController::class, 'updateQuestionForm']);
+$router->post('/admin/update-question', [QuestionController::class, 'updateQuestion']);
+$router->post('/admin/delete-question', [QuestionController::class, 'deleteQuestion']);
+
+$router->get('/admin/answers/{id}', [AnswerController::class, 'getAnswersForQuestion']);
+$router->get('/admin/add-answer-form/{id}', [AnswerController::class, 'addAnswerForm']);
+$router->post('/admin/add-answer', [AnswerController::class, 'addAnswer']);
+$router->get('/admin/update-answer-form/{id}', [AnswerController::class, 'updateAnswerForm']);
+$router->post('/admin/update-answer', [AnswerController::class, 'updateAnswer']);
+$router->post('/admin/delete-answer', [AnswerController::class, 'deleteAnswer']);
+
 $router->get('/register-form', [AuthController::class, 'showRegisterForm']);
 $router->post('/register', [AuthController::class, 'register']);
 $router->get('/login-form', [AuthController::class, 'showLoginForm']);
@@ -26,7 +41,8 @@ $router->get('/logout', [AuthController::class, 'logout']);
 $router->paginate('/', QuizController::class, 'showAllQuizzes');
 $router->get('/quiz/{id}', [QuizController::class, 'showQuiz']);
 $router->post('/submit-quiz', [QuizController::class, 'submitQuiz']);
-$router->get('/quiz-result/{quiz_id}', [QuizController::class, 'showQuizResult']);
+$router->get('/quiz-result/{id}', [QuizController::class, 'showQuizResult']);
+
 
 // Definiowanie grupy middleware dla tras zaczynających się od '/admin'
 $router->middlewareGroup('/admin', [AdminMiddleware::class]);
