@@ -39,7 +39,7 @@ class Question {
         return $stmt->execute();
     }
 
-    public function getAllQuestions($limit, $offset) {
+    public function getAllQuestionsPaginated($limit, $offset) {
         $query = "
         SELECT q.*, qu.title AS quiz_title
         FROM questions q

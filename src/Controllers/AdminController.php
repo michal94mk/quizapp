@@ -8,7 +8,6 @@ use App\Models\Quiz;
 use App\Models\Question;
 use App\Models\User;
 
-
 class AdminController {
     public function index() {
         $userModel = new User();
@@ -44,7 +43,7 @@ class AdminController {
         $totalPages = ceil($totalQuizzes / $quizzesPerPage);
 
         $view = new View(
-            PathHelper::view('admin/quizzes.php'),
+            PathHelper::view('admin/quizzes/quizzes.php'),
             PathHelper::layout('admin/admin.php')
         );
 

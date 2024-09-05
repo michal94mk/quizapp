@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\Answer;
-use App\Models\Question;
 use App\View\View;
 use App\Helper\PathHelper;
 
@@ -13,7 +12,7 @@ class AnswerController {
         $answers = $answerModel->getAnswersByQuestionId($id);
 
         $view = new View(
-            PathHelper::view('admin/answers.php'),
+            PathHelper::view('admin/answers/answers.php'),
             PathHelper::layout('admin/admin.php')
         );
 
@@ -38,7 +37,7 @@ class AnswerController {
 
     public function addAnswerForm($id) {
         $view = new View(
-            PathHelper::view('admin/add_answer.php'),
+            PathHelper::view('admin/answers/add_answer.php'),
             PathHelper::layout('admin/admin.php')
         );
 
@@ -65,8 +64,6 @@ class AnswerController {
             echo "Invalid request method.";
         }
     }
-    
-
 
     public function updateAnswerForm($id) {
         $answerModel = new Answer();
@@ -74,7 +71,7 @@ class AnswerController {
         $answer = $answerModel->getAnswerById($id);
     
         $view = new View(
-            PathHelper::view('admin/update_answer.php'),
+            PathHelper::view('admin/answers/update_answer.php'),
             PathHelper::layout('admin/admin.php')
         );
     

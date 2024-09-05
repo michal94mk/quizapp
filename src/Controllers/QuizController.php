@@ -84,7 +84,6 @@ class QuizController {
         ])->render();
     }
 
-
     public function submitQuiz() {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['message'] = 'Aby wysłać quiz musisz się zalogować';
@@ -153,7 +152,7 @@ class QuizController {
 
     public function addQuizForm() {
         $view = new View(
-            PathHelper::view('admin/add_quiz.php'),
+            PathHelper::view('admin/quizzes/add_quiz.php'),
             PathHelper::layout('admin/admin.php')
         );
 
@@ -186,7 +185,7 @@ class QuizController {
         }
 
         $view = new View(
-            PathHelper::view('admin/update_quiz_with_questions.php'),
+            PathHelper::view('admin/quizzes/update_quiz.php'),
             PathHelper::layout('admin/admin.php')
         );
 

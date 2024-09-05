@@ -12,14 +12,14 @@ class QuestionController {
         $questionModel = new Question();
         $quizModel = new Quiz();
         $quizzes = $quizModel->getAllQuizzesTitles();
-        $questionsPerPage = 12;
-        $offset = ($page - 1) * $questionsPerPage;
-        $questions = $questionModel->getAllQuestions($questionsPerPage, $offset);
+        $limit = 12;
+        $offset = ($page - 1) * $limit;
+        $questions = $questionModel->getAllQuestionsPaginated($limit, $offset);
         $totalQuestions = $questionModel->getQuestionCount();
-        $totalPages = ceil($totalQuestions / $questionsPerPage);
+        $totalPages = ceil($totalQuestions / $limit);
 
         $view = new View(
-            PathHelper::view('admin/questions.php'),
+            PathHelper::view('admin/questions/questions.php'),
             PathHelper::layout('admin/admin.php')
         );
 
@@ -36,7 +36,7 @@ class QuestionController {
         $quizModel = new Quiz();
         $quizzes = $quizModel->getAllQuizzesTitles();
         $view = new View(
-            PathHelper::view('admin/add_question.php'),
+            PathHelper::view('admin/questions/add_question.php'),
             PathHelper::layout('admin/admin.php')
         );
 
@@ -81,7 +81,7 @@ class QuestionController {
         $quizzes = $quizModel->getAllQuizzesTitles();
 
         $view = new View(
-            PathHelper::view('admin/update_question.php'),
+            PathHelper::view('admin/questions/update_question.php'),
             PathHelper::layout('admin/admin.php')
         );
 

@@ -20,6 +20,23 @@ class User {
         $this->conn = $db->getPdo();
     }
 
+    public function getAllUsersPaginated($limit, $offset) {
+        $query = "SELECT * FROM users LIMIT :limit OFFSET :offset";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getUserById($id) {
+        $query = "SELECT * FROM users WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+    
     public function save() {
         $query = "INSERT INTO " . $this->table_name . " 
                   SET username = :username, 
@@ -63,6 +80,42 @@ class User {
         }
     }
 
+    public function create($username, $password, $email, $role) {
+        $query = "INSERT INTO users (username, password, email, role) VALUES (:username, :password, :email, :role)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':username', $username, \PDO::PARAM_STR);
+        $stmt->bindParam(':password', $password, \PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
+        $stmt->bindParam(':role', $role, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+
+    public function update($id, $username, $password, $email, $role) {
+        if (empty($username)) {
+            echo "Nazwa użytkownika nie może być pusta.";
+            exit;
+        }
+    
+        $sql = "UPDATE users SET username = :username, email = :email, role = :role";
+        if (!empty($password)) {
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $sql .= ", password = :password";
+        }
+        $sql .= " WHERE id = :id";
+    
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':role', $role);
+        $stmt->bindParam(':id', $id);
+        if (!empty($password)) {
+            $stmt->bindParam(':password', $hashedPassword);
+        }
+    
+        $stmt->execute();
+    }
+    
+
     public function usernameExists($username) {
         $query = "SELECT id FROM " . $this->table_name . " WHERE username = :username";
         $stmt = $this->conn->prepare($query);
@@ -105,5 +158,12 @@ class User {
         $query = "SELECT COUNT(*) FROM users";
         $stmt = $this->conn->query($query);
         return $stmt->fetchColumn();
+    }
+
+    public function delete($id) {
+        $query = "DELETE FROM users WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        return $stmt->execute();
     }
 }

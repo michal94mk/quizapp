@@ -3,6 +3,7 @@
 use App\Controllers\HomeController;
 use App\Controllers\AdminController;
 use App\Controllers\AuthController;
+use App\Controllers\UserController;
 use App\Controllers\QuizController;
 use App\Controllers\QuestionController;
 use App\Controllers\AnswerController;
@@ -31,6 +32,13 @@ $router->post('/admin/add-answer', [AnswerController::class, 'addAnswer']);
 $router->get('/admin/update-answer-form/{id}', [AnswerController::class, 'updateAnswerForm']);
 $router->post('/admin/update-answer', [AnswerController::class, 'updateAnswer']);
 $router->post('/admin/delete-answer', [AnswerController::class, 'deleteAnswer']);
+
+$router->paginate('/admin/users', UserController::class, 'showAllUsers');
+$router->get('/admin/add-user-form', [UserController::class, 'addUserForm']);
+$router->post('/admin/add-user', [UserController::class, 'addUser']);
+$router->get('/admin/update-user-form/{id}', [UserController::class, 'updateUserForm']);
+$router->post('/admin/update-user', [UserController::class, 'updateUser']);
+$router->post('/admin/delete-user', [UserController::class, 'deleteUser']);
 
 $router->get('/register-form', [AuthController::class, 'showRegisterForm']);
 $router->post('/register', [AuthController::class, 'register']);
