@@ -10,6 +10,8 @@ use App\Controllers\AnswerController;
 use App\Middlewares\AdminMiddleware;
 
 $router->get('/about', [HomeController::class, 'about']);
+$router->get('/best-results/all', [HomeController::class, 'showAllBestResults']);
+$router->get('/best-results/quiz/', [HomeController::class, 'showBestResultsForQuiz']);
 
 $router->get('/admin', [AdminController::class, 'index']);
 $router->paginate('/admin/quizzes', AdminController::class, 'quizzes');
@@ -50,7 +52,6 @@ $router->paginate('/', QuizController::class, 'showAllQuizzes');
 $router->get('/quiz/{id}', [QuizController::class, 'showQuiz']);
 $router->post('/submit-quiz', [QuizController::class, 'submitQuiz']);
 $router->get('/quiz-result/{id}', [QuizController::class, 'showQuizResult']);
-
 
 // Definiowanie grupy middleware dla tras zaczynających się od '/admin'
 $router->middlewareGroup('/admin', [AdminMiddleware::class]);

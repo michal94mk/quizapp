@@ -63,6 +63,10 @@ footer {
     padding: 10px 0;
 }
 
+.horizontal-nav a.admin-panel {
+    color: red;
+}
+
 .horizontal-nav ul {
     display: flex;
     justify-content: center;
@@ -124,6 +128,10 @@ footer {
 
 .sidebar.active {
     transform: translateX(0);
+}
+
+.sidebar nav ul li a.admin-panel {
+    color: red;
 }
 
 .sidebar nav ul {
@@ -346,7 +354,7 @@ input[type="checkbox"] {
     width: 100%;
     margin: auto;
     margin-bottom: 45px;
-    background-color: #fff;
+    background-color: lightgray;
     min-height: 90vh;
     position: relative;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -430,6 +438,7 @@ input[type="checkbox"] {
     height: 40px;
     padding: 2px;
     border-radius: 2px;
+    text-align: center;
 }
 
 
@@ -480,6 +489,7 @@ input[type="checkbox"] {
     height: 40px;
     padding: 2px;
     border-radius: 2px;
+    text-align: center;
 }
 
 
@@ -503,6 +513,45 @@ input[type="checkbox"] {
 
 .questions-table td:nth-child(4) {
     width: auto;
+    text-align: center;
+}
+
+.users-table-container {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    overflow: hidden;
+
+}
+
+.users-table {
+    width: 100%;
+    height: 100%;
+    border: 1px solid;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 2px;
+    justify-content: center;
+    align-items: center;
+}
+
+.users-table th, td {
+    border: 1px solid;
+    height: 40px;
+    padding: 2px;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.users-table td:nth-child(3) {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.users-table td:nth-child(7) {
     text-align: center;
 }
 

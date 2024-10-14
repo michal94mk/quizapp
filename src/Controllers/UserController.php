@@ -6,6 +6,7 @@ use App\Models\User;
 use App\View\View;
 use App\Helper\PathHelper;
 
+
 class UserController {
     public function showAllUsers($page = 1) {
         $userModel = new User();

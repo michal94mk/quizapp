@@ -16,7 +16,6 @@ class UserQuizResult {
     }
 
     public function createResult($userId, $quizId, $score) {
-    
         $query = "INSERT INTO user_quiz_results (user_id, quiz_id, score) VALUES (:user_id, :quiz_id, :score)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $userId, \PDO::PARAM_INT);
@@ -25,23 +24,109 @@ class UserQuizResult {
     
         return $stmt->execute();
     }
+
+    public function getAllBestResults() {
+      $query = "WITH RankedResults AS (
+                  SELECT 
+                      q.title AS quiz_title, 
+                      u.username AS user_name, 
+                      ur.score AS highest_score, 
+                      ROW_NUMBER() OVER (PARTITION BY q.id ORDER BY ur.score DESC) AS rank
+                  FROM 
+                      user_quiz_results ur
+                  JOIN 
+                      quizzes q ON ur.quiz_id = q.id
+                  JOIN 
+                      users u ON ur.user_id = u.id
+                )
+                SELECT 
+                  quiz_title, 
+                  user_name, 
+                  highest_score 
+                FROM 
+                  RankedResults 
+                WHERE 
+                  rank <= 5";
+  
+      $stmt = $this->conn->prepare($query);
+      $stmt->execute();
+      
+      return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+  
+
+  public function getBestResultsForQuiz($quizId) {
+    $query = "WITH RankedResults AS (
+                SELECT 
+                    u.username AS user_name, 
+                    ur.score AS highest_score, 
+                    ROW_NUMBER() OVER (ORDER BY ur.score DESC) AS rank
+                FROM 
+                    user_quiz_results ur
+                JOIN 
+                    users u ON ur.user_id = u.id
+                WHERE 
+                    ur.quiz_id = :quiz_id
+              )
+              SELECT 
+                user_name, 
+                highest_score 
+              FROM 
+                RankedResults 
+              WHERE 
+                rank <= 5";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':quiz_id', $quizId, \PDO::PARAM_INT);
+    $stmt->execute();
+    
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+  
+  public function getResultCountForQuiz($quizId = null) {
+      $query = "SELECT COUNT(DISTINCT ur.user_id, ur.quiz_id) as count FROM user_quiz_results ur";
+  
+      if ($quizId) {
+          $query .= " WHERE ur.quiz_id = :quiz_id";
+      }
+  
+      $stmt = $this->conn->prepare($query);
+      
+      if ($quizId) {
+          $stmt->bindParam(':quiz_id', $quizId, \PDO::PARAM_INT);
+      }
+  
+      $stmt->execute();
+      return $stmt->fetch(\PDO::FETCH_ASSOC)['count'];
+  }
+  
+
+    public function getResultCount() {
+        $query = "SELECT COUNT(*) as count FROM user_quiz_results";
+        $stmt = $this->conn->query($query);
+        return $stmt->fetch(\PDO::FETCH_ASSOC)['count'];
+    }
     
     public function getResult($userId, $quizId) {
-        $query = "SELECT * FROM user_quiz_results WHERE user_id = :user_id AND quiz_id = :quiz_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':user_id', $userId, \PDO::PARAM_INT);
-        $stmt->bindParam(':quiz_id', $quizId, \PDO::PARAM_INT);
-        $stmt->execute();
-    
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        
-        return $result;
-    }
-
-    public function getResultByQuizAndUser($quiz_id, $user_id) {
-        $query = "SELECT * FROM user_quiz_results WHERE user_id = ? AND quiz_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute([$quiz_id, $user_id]);
-        return $stmt->fetch();
-    }
+      $query = "SELECT 
+                  score, 
+                  completed_at 
+                FROM 
+                  user_quiz_results 
+                WHERE 
+                  user_id = :user_id 
+                  AND quiz_id = :quiz_id
+                ORDER BY 
+                  completed_at DESC 
+                LIMIT 1";
+  
+      $stmt = $this->conn->prepare($query);
+      
+      $stmt->bindParam(':user_id', $userId, \PDO::PARAM_INT);
+      $stmt->bindParam(':quiz_id', $quizId, \PDO::PARAM_INT);
+      
+      $stmt->execute();
+      
+      return $stmt->fetch(\PDO::FETCH_ASSOC);
+  }  
 }

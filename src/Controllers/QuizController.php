@@ -68,10 +68,10 @@ class QuizController {
     }
 
     public function showQuizResult($id) {
-        $user_id = $_SESSION['user_id'];
+        $userId = $_SESSION['user_id'];
     
         $userQuizResult = new UserQuizResult();
-        $result = $userQuizResult->getResult($user_id, $id);
+        $result = $userQuizResult->getResult($userId, $id);
     
         $view = new View(
             PathHelper::view('quiz_result.php'),
