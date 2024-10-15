@@ -11,7 +11,7 @@ use App\View\View;
 use App\Helper\PathHelper;
 
 class QuizController {
-    public function showAllQuizzes($page = 1) {
+    public function showAllQuizzesPaginated($page = 1) {
             $quizModel = new Quiz();
             $quizzesPerPage = 9;
             $offset = ($page - 1) * $quizzesPerPage;

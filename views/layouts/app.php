@@ -24,7 +24,7 @@
             ?>
             <li><a href="/" class="<?= ($currentPath == '/') ? 'active' : '' ?>">Home</a></li>
             <li><a href="/about" class="<?= ($currentPath == '/about') ? 'active' : '' ?>">About</a></li>
-            <li><a href="/best-results/all" class="<?= ($currentPath == '/best-results/all') ? 'active' : '' ?>">Best Results</a></li>
+            <li><a href="/best-results/all" class="<?= ($currentPath == '/best-results/all') ? 'active' : '' ?>">Top 10 results</a></li>
             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') { ?>
                 <li><a href="/admin" class="admin-panel <?= ($currentPath == '/admin') ? 'active' : '' ?>">Admin Panel</a></li>
             <?php } ?>
@@ -42,7 +42,7 @@
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
-                <li><a href="/best-results">Best results</a></li>
+                <li><a href="/best-results/all">Top 10 results</a></li>
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') { ?>
                     <li><a href="/admin" class="admin-panel <?= ($currentPath == '/admin') ? 'active' : '' ?>">Admin Panel</a></li>
                 <?php } ?>
@@ -105,22 +105,6 @@
                 <p>No content available.</p>
             <?php endif; ?>
         </div>
-
-        <?php if (isset($currentPage)): ?>
-            <div class="pagination">
-                <?php if ($currentPage > 1): ?>
-                    <a href="/?page=<?php echo $currentPage - 1; ?>">&laquo; Previous</a>
-                <?php endif; ?>
-
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="/?page=<?php echo $i; ?>"<?php if ($i == $currentPage) echo ' class="active"'; ?>><?php echo $i; ?></a>
-                <?php endfor; ?>
-
-                <?php if ($currentPage < $totalPages): ?>
-                    <a href="/?page=<?php echo $currentPage + 1; ?>">Next &raquo;</a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
     </main>
 
     <footer>

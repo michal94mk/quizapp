@@ -1,4 +1,4 @@
-<h1>Best results</h1>
+<h1>Top 10 results</h1>
 <div class="quiz-select">
 <form method="GET" action="/best-results/quiz/">
     <label for="quiz">Select a quiz:</label>
@@ -39,5 +39,3 @@
     </tbody>
 </table>
 </div>
-
-

@@ -22,18 +22,22 @@ class HomeController {
         ])->render();
     }
 
-    public function showAllBestResults() {
+    public function showTop10Results($page = 1) {
         $resultModel = new UserQuizResult();
         $quizModel = new Quiz();
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+        $totalResults = $resultModel->getResultCount();
+        $totalPages = ceil($totalResults / $limit);
         
         $quizzes = $quizModel->getAllQuizzes();
         
         $selectedQuizId = isset($_GET['quiz_id']) ? $_GET['quiz_id'] : null;
     
         if ($selectedQuizId) {
-            $results = $resultModel->getBestResultsForQuiz($selectedQuizId);
+            $results = $resultModel->getTop10ResultsForQuiz($selectedQuizId);
         } else {
-            $results = $resultModel->getAllBestResults();
+            $results = $resultModel->getTop10BestResults($limit, $offset);
         }
     
         $view = new View(
@@ -45,11 +49,13 @@ class HomeController {
             'title' => 'All Best Results',
             'results' => $results,
             'quizzes' => $quizzes,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
             'selectedQuizId' => $selectedQuizId
         ])->render();
     }
 
-    public function showBestResultsForQuiz() {
+    public function showTop10ResultsForQuiz() {
         $resultModel = new UserQuizResult();
         $quizModel = new Quiz();
     
@@ -59,7 +65,7 @@ class HomeController {
             throw new \Exception('Quiz not selected.');
         }
     
-        $results = $resultModel->getBestResultsForQuiz($quizId);
+        $results = $resultModel->getTop10ResultsForQuiz($quizId);
     
         $quiz = $quizModel->getQuizById($quizId);
         if (!$quiz) {

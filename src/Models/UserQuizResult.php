@@ -25,56 +25,50 @@ class UserQuizResult {
         return $stmt->execute();
     }
 
-    public function getAllBestResults() {
-      $query = "WITH RankedResults AS (
-                  SELECT 
-                      q.title AS quiz_title, 
-                      u.username AS user_name, 
-                      ur.score AS highest_score, 
-                      ROW_NUMBER() OVER (PARTITION BY q.id ORDER BY ur.score DESC) AS rank
-                  FROM 
-                      user_quiz_results ur
-                  JOIN 
-                      quizzes q ON ur.quiz_id = q.id
-                  JOIN 
-                      users u ON ur.user_id = u.id
-                )
-                SELECT 
-                  quiz_title, 
-                  user_name, 
-                  highest_score 
-                FROM 
-                  RankedResults 
-                WHERE 
-                  rank <= 5";
+    public function getTop10BestResults($limit, $offset) {
+      $query = "
+          SELECT 
+              q.title AS quiz_title, 
+              u.username AS user_name, 
+              ur.score AS highest_score
+          FROM 
+              user_quiz_results ur
+          JOIN 
+              quizzes q ON ur.quiz_id = q.id
+          JOIN 
+              users u ON ur.user_id = u.id
+          ORDER BY 
+              ur.score DESC
+          LIMIT 
+              :limit 
+          OFFSET 
+              :offset
+      ";
   
       $stmt = $this->conn->prepare($query);
+      $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+      $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
       $stmt->execute();
       
       return $stmt->fetchAll(\PDO::FETCH_ASSOC);
   }
   
-
-  public function getBestResultsForQuiz($quizId) {
-    $query = "WITH RankedResults AS (
-                SELECT 
-                    u.username AS user_name, 
-                    ur.score AS highest_score, 
-                    ROW_NUMBER() OVER (ORDER BY ur.score DESC) AS rank
-                FROM 
-                    user_quiz_results ur
-                JOIN 
-                    users u ON ur.user_id = u.id
-                WHERE 
-                    ur.quiz_id = :quiz_id
-              )
-              SELECT 
-                user_name, 
-                highest_score 
-              FROM 
-                RankedResults 
-              WHERE 
-                rank <= 5";
+  
+  public function getTop10ResultsForQuiz($quizId) {
+    $query = "
+        SELECT 
+            u.username AS user_name, 
+            ur.score AS highest_score
+        FROM 
+            user_quiz_results ur
+        JOIN 
+            users u ON ur.user_id = u.id
+        WHERE 
+            ur.quiz_id = :quiz_id
+        ORDER BY 
+            ur.score DESC
+        LIMIT 10
+    ";
     
     $stmt = $this->conn->prepare($query);
     $stmt->bindParam(':quiz_id', $quizId, \PDO::PARAM_INT);
@@ -82,6 +76,7 @@ class UserQuizResult {
     
     return $stmt->fetchAll(\PDO::FETCH_ASSOC);
 }
+
   
   public function getResultCountForQuiz($quizId = null) {
       $query = "SELECT COUNT(DISTINCT ur.user_id, ur.quiz_id) as count FROM user_quiz_results ur";
