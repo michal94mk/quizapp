@@ -662,6 +662,66 @@ input[type="checkbox"] {
 }
 /* ----------------------- */
 
+.quiz-select {
+    display: flex;
+    justify-content: center; /* Wyśrodkowanie poziome formularza */
+    align-items: center; /* Wyśrodkowanie pionowe */
+    gap: 10px; /* Odstępy między elementami */
+    margin-top: 20px; /* Opcjonalnie, margines nad formularzem */
+}
+
+.quiz-label {
+    font-size: 14px;
+    color: #555;
+}
+
+.quiz-select-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+.quiz-button {
+    background-color: lightgray;
+    width: 130px;
+    height: 30px;
+    padding: 5px;
+    margin-top: 20px;
+    justify-content: center;
+    border-radius: 2px;
+    border: none;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+}
+
+.quiz-button:hover {
+    cursor: pointer;
+    background-color: gray;
+}
+
+.back-button {
+    background-color: lightgray;
+    width: 130px;
+    height: 30px;
+    padding: 5px;
+    margin-top: 20px;
+    border-radius: 2px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+    cursor: pointer;
+    background-color: gray;
+}
+
+
 /* Formularz logowania */
 #username {
     width: 250px;

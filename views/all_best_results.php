@@ -1,18 +1,20 @@
 <h1>Top 10 results</h1>
 <div class="quiz-select">
-<form method="GET" action="/best-results/quiz/">
-    <label for="quiz">Select a quiz:</label>
-    <select name="quiz_id" id="quiz">
-        <option value="">-- Select a quiz --</option>
-        <?php foreach ($quizzes as $quiz): ?>
-            <option value="<?= $quiz['id'] ?>" <?= $quiz['id'] == $selectedQuizId ? 'selected' : '' ?>>
-                <?= $quiz['title'] ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-    <button type="submit">Show Results</button>
-</form>
+    <form method="GET" action="/best-results/quiz/">
+        <label for="quiz" class="quiz-label">Select a quiz:</label>
+        <select name="quiz_id" id="quiz" class="quiz-select-input" required>
+            <option value="">-- Select a quiz --</option>
+            <?php foreach ($quizzes as $quiz): ?>
+                <option value="<?= $quiz['id'] ?>" <?= $quiz['id'] == $selectedQuizId ? 'selected' : '' ?>>
+                    <?= $quiz['title'] ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <button type="submit" class="quiz-button">Show Results</button>
+    </form>
 </div>
+
 <div class="questions-table-container">
 <table class="questions-table">
     <thead>

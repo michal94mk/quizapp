@@ -1,5 +1,5 @@
 <h1>Best Results for Quiz: <?= $quizTitle ?></h1>
-
+<a href="/best-results/all" class="back-button">Back</a>
 <table class="questions-table">
     <thead>
         <tr>
