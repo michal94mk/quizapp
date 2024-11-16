@@ -204,8 +204,6 @@ footer {
     justify-content: center;
     gap: 16px;
     padding: 20px;
-    margin-bottom: 100px;
-
 }
 
 .quizzes-title {
@@ -294,17 +292,24 @@ input[type="checkbox"] {
 /* --------- */
 
 /* Paginacja */
+.pagination-wrapper {
+    width: auto;
+    height: 100px;
+}
+
 .pagination {
-    position: absolute;
-    margin-top: 30px;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pagination a {
-    margin: 0 5px;
-    padding: 8px 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    width: 40px;
+    margin: 0 3px;
     border: 1px solid #ddd;
     text-decoration: none;
     color: #333;
@@ -315,6 +320,70 @@ input[type="checkbox"] {
     color: white;
     border-color: gray;
 }
+
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    color: #888;
+    cursor: pointer;
+}
+
+.pagination-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    cursor: pointer;
+    color: #888;
+    padding: 8px 12px;
+    border: 1px solid #888;
+}
+
+.page-input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: 40px;
+    margin-bottom: 10px;
+}
+
+.page-input-container input[type="number"] {
+    font-size: 15px;
+    height: 40px;
+    width: 100px;
+    text-align: center;
+}
+
+
+.go-button {
+    font-size: 15px;
+    height: 40px;
+    width: 40px;
+    padding: 5px;
+    background-color: lightgray;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.go-button:hover {
+    background-color: gray;
+}
+
+.pagination a.prev-btn {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+}
+
+.pagination a.next-btn {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+}
+
+
 /* --------- */
 
 /* Wiadomości */
@@ -354,7 +423,7 @@ input[type="checkbox"] {
     width: 100%;
     margin: auto;
     margin-bottom: 45px;
-    background-color: lightgray;
+    background-color: #fff;
     min-height: 90vh;
     position: relative;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -414,189 +483,175 @@ input[type="checkbox"] {
     margin: 10px 0;
 }
 
-.quizzes-table-container {
-    width: 100%;
-    height: 600px;
-    padding: 20px;
-    overflow: hidden;
 
+/* Ogólny styl dla kontenera formularza */
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 350px;
+    padding: 20px;
+    margin: 20px auto;
+}
+
+/* Styl dla każdego formularza */
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* Styl dla pól tekstowych i textarea */
+.form-input, .form-textarea {
+    width: 250px;
+    border: 1px solid;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 12px;
+}
+
+/* Specjalne ustawienie dla textarea */
+.form-textarea {
+    height: 100px;
+    resize: none;
+}
+
+/* Styl dla przycisków */
+
+.btn {
+    padding: 5px 10px;
+    margin: 0;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 80px;
+    height: auto;
+}
+
+.add-btn { background-color: green; }
+.edit-btn { background-color: #28a745; }
+.delete-btn { background-color: #dc3545; }
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.form-btn {
+    background-color: lightgray;
+    width: 130px;
+    height: 30px;
+    padding: 5px;
+    margin-top: 20px;
+    border-radius: 2px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+    border: none;
+}
+
+.form-btn:hover {
+    cursor: pointer;
+    background-color: gray;
+}
+
+/* ---------- */
+
+
+/* Ogólne style dla tabel */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 5px;
+    text-align: center;
+    height: 40px;
+    background-color: #fff;
+}
+
+.quizzes-table-container, 
+.questions-table-container, 
+.users-table-container {
+    margin-top: 20px;
+    padding: 10px;
+    overflow-x: auto;
+    background-color: #f8f9fa;
+    border-radius: 4px;
 }
 
 .quizzes-table {
-    width: 100%;
-    max-height: 580px;
-    border: 1px solid;
     margin-top: 10px;
     padding: 10px;
     border-radius: 2px;
-    justify-content: center;
-    align-items: center;
-}
-
-.quizzes-table th, td {
-    border: 1px solid;
-    height: 40px;
-    padding: 2px;
-    border-radius: 2px;
-    text-align: center;
-}
-
-
-.quizzes-table td:nth-child(1) {
-    width: 50px;
-    text-align: center;
-}
-
-.quizzes-table td:nth-child(2) {
-    width: 300px;
-    text-align: center;
+    width: 100%;
 }
 
 .quizzes-table td:nth-child(3) {
-    max-width: 300px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-}
-
-.quizzes-table td:nth-child(4) {
-    width: 200px;
-    text-align: center;
-}
-
-.questions-table-container {
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    overflow: hidden;
-
-}
-
-.questions-table {
-    width: 100%;
-    height: 100%;
-    border: 1px solid;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 2px;
-    justify-content: center;
-    align-items: center;
-}
-
-.questions-table th, td {
-    border: 1px solid;
-    height: 40px;
-    padding: 2px;
-    border-radius: 2px;
-    text-align: center;
-}
-
-
-.questions-table td:nth-child(1) {
-    width: auto;
-    text-align: center;
-}
-
-.questions-table td:nth-child(2) {
-    width: auto;
-    text-align: center;
-}
-
-.questions-table td:nth-child(3) {
-    max-width: auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-}
-
-.questions-table td:nth-child(4) {
-    width: auto;
-    text-align: center;
-}
-
-.users-table-container {
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    overflow: hidden;
-
-}
-
-.users-table {
-    width: 100%;
-    height: 100%;
-    border: 1px solid;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 2px;
-    justify-content: center;
-    align-items: center;
-}
-
-.users-table th, td {
-    border: 1px solid;
-    height: 40px;
-    padding: 2px;
-    border-radius: 2px;
-    text-align: center;
-}
-
-.users-table td:nth-child(3) {
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: center;
+}
+
+.quizzes-table th:nth-child(5),
+.quizzes-table td:nth-child(5) {
+    width: 200px;
+}
+
+.questions-table, 
+.users-table {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 2px;
+}
+
+.questions-table td:nth-child(3), 
+.users-table td:nth-child(3) {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .users-table td:nth-child(7) {
     text-align: center;
 }
 
-.btn {
-    width: 60px;
-    height: 30px;
-    padding: 5px 10px;
-    margin: 0;
-    text-align: center;
+td.actions-column {
+    padding: 0;
+}
+
+.actions-column > a, .actions-column > form {
+    display: inline-flex;
+    gap: 5px;
+    justify-content: center;
     text-decoration: none;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.add-btn {
-    background-color: green;
-    margin-left: 0;
-}
-
-.edit-btn {
-    background-color: #28a745;
-}
-
-.delete-btn {
-    background-color: #dc3545; 
-    margin-left: 5px;
-}
-
-.btn:hover {
-    opacity: 0.8;
 }
 
 .dashboard-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin: auto;
+    padding: 0;
 }
+
 .dashboard-box {
     width: 150px;
     height: 150px;
+    margin-bottom: 10px;
     position: relative;
     flex: 1;
     border: 1px solid #ddd;
@@ -660,14 +715,13 @@ input[type="checkbox"] {
     cursor: pointer;
     transform: scale(1.03);
 }
-/* ----------------------- */
 
 .quiz-select {
     display: flex;
-    justify-content: center; /* Wyśrodkowanie poziome formularza */
-    align-items: center; /* Wyśrodkowanie pionowe */
-    gap: 10px; /* Odstępy między elementami */
-    margin-top: 20px; /* Opcjonalnie, margines nad formularzem */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .quiz-label {
@@ -707,7 +761,7 @@ input[type="checkbox"] {
     width: 130px;
     height: 30px;
     padding: 5px;
-    margin-top: 20px;
+    margin: 20px 0;
     border-radius: 2px;
     text-align: center;
     text-decoration: none;
@@ -721,62 +775,7 @@ input[type="checkbox"] {
     background-color: gray;
 }
 
-
-/* Formularz logowania */
-#username {
-    width: 250px;
-    border: 1px solid;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 12px;
-}
-
-#password {
-    width: 250px;
-    border: 1px solid;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 12px;
-}
-
-.login-btn {
-    background-color: lightgray;
-    width: 130px;
-    height: 30px;
-    padding: 5px;
-    margin-top: 20px;
-    justify-content: center;
-    border-radius: 2px;
-    transition: background-color 0.2s ease;
-}
-
-.login-btn:hover {
-    cursor: pointer;
-    background-color: gray;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f4f4f4;
-    padding: 20px;
-}
-
-.login-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 310px;
-    height: auto;
-    padding: 20px;
-}
-
+/* Formularz logowania - inne */
 .register-now {
     position: relative;
     color: black;
@@ -798,76 +797,11 @@ input[type="checkbox"] {
     width: 100%;
     left: 0;
 }
-/* ----------------------- */
-
-/* Formularz rejestracji */
-#username {
-    width: 250px;
-    border: 1px solid;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 12px;
-}
-
-#password {
-    width: 250px;
-    border: 1px solid;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 12px;
-}
-
-#email {
-    width: 250px;
-    border: 1px solid;
-    padding: 10px;
-    margin: 10px 0;
-    font-size: 12px;
-}
-
-.register-btn {
-    background-color: lightgray;
-    width: 130px;
-    height: 30px;
-    padding: 5px;
-    margin-top: 20px;
-    justify-content: center;
-    border-radius: 2px;
-    transition: background-color 0.2s ease;
-}
-
-.register-btn:hover {
-    cursor: pointer;
-    background-color: gray;
-}
-
-.register-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f4f4f4;
-    padding: 20px;
-}
-
-.register-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 310px;
-    height: auto;
-    padding: 20px;
-}
 
 /* ----------------------- */
 
 
 /* Responsywność */
-/* ------------- */
 
 @media (min-width: 769px) {
     .toggle-btn-container {
@@ -888,6 +822,17 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 768px) {
+    main {
+        width: 100%;
+        border-radius: 0px;
+    }
+    
+    .quiz-card {
+        width: 180px;
+        height: 180px;
+        padding: 15px;
+    }
+
     .horizontal-nav {
         display: none;
     }
@@ -896,15 +841,31 @@ input[type="checkbox"] {
         display: block;
     }
 
-    .pagination a {
-        margin: 0 2px;
-        padding: 4px 6px;
-        border: 1px solid #ddd;
-        text-decoration: none;
-        color: #333;
-    }
-
     p.quiz-description {
         font-size: 12px;
     }
+
+    .questions-table td:nth-child(3), .users-table td:nth-child(3) {
+        max-width: 100px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    th, td {
+        padding: 3px;
+        font-size: 12px;
 }
+
+@media (max-width: 480px) {
+    th, td {
+        font-size: 10px;
+    }
+
+    .btn {
+        font-size: 12px;
+    }
+}
+/* ------------- */

@@ -3,12 +3,10 @@
         <h5>Total Users</h5>
         <p><?php echo htmlspecialchars($totalUsers); ?></p>
     </div>
-
     <div class="dashboard-box">
         <h5>Total Quizzes</h5>
         <p><?php echo htmlspecialchars($totalQuizzes); ?></p>
     </div>
-
     <div class="dashboard-box">
         <h5>Total Questions</h5>
         <p><?php echo htmlspecialchars($totalQuestions); ?></p>

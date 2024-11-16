@@ -15,8 +15,8 @@
     </form>
 </div>
 
-<div class="questions-table-container">
-<table class="questions-table">
+<div class="quizzes-table-container">
+<table class="quizzes-table">
     <thead>
         <tr>
             <th>Quiz Title</th>

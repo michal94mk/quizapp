@@ -46,7 +46,7 @@ class HomeController {
         );
         
         $view->with([
-            'title' => 'All Best Results',
+            'title' => 'Top 10 results',
             'results' => $results,
             'quizzes' => $quizzes,
             'currentPage' => $page,
@@ -79,7 +79,7 @@ class HomeController {
         );
         
         $view->with([
-            'title' => 'Best Results for Quiz',
+            'title' => 'Best results for quiz',
             'results' => $results,
             'quizTitle' => $quizTitle
         ])->render();
