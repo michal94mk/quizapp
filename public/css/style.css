@@ -507,7 +507,6 @@ input[type="checkbox"] {
     width: 100%;
 }
 
-/* Styl dla pól tekstowych i textarea */
 .form-input, .form-textarea {
     width: 250px;
     border: 1px solid;
@@ -516,7 +515,6 @@ input[type="checkbox"] {
     font-size: 12px;
 }
 
-/* Specjalne ustawienie dla textarea */
 .form-textarea {
     height: 100px;
     resize: none;

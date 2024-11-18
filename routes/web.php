@@ -14,7 +14,7 @@ $router->get('/best-results/all', [HomeController::class, 'showTop10Results']);
 $router->get('/best-results/quiz/', [HomeController::class, 'showTop10ResultsForQuiz']);
 
 $router->get('/admin', [AdminController::class, 'index']);
-$router->paginate('/admin/quizzes', AdminController::class, 'quizzes');
+$router->paginate('/admin/quizzes', QuizController::class, 'showAllQuizzes');
 $router->get('/admin/add-quiz-form', [QuizController::class, 'addQuizForm']);
 $router->post('/admin/add-quiz', [QuizController::class, 'addQuiz']);
 $router->get('/admin/update-quiz-form/{id}', [QuizController::class, 'updateQuizForm']);
@@ -48,7 +48,7 @@ $router->get('/login-form', [AuthController::class, 'showLoginForm']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/logout', [AuthController::class, 'logout']);
 
-$router->paginate('/', QuizController::class, 'showAllQuizzesPaginated');
+$router->paginate('/', QuizController::class, 'showAllQuizzesForUsers');
 $router->get('/quiz/{id}', [QuizController::class, 'showQuiz']);
 $router->post('/submit-quiz', [QuizController::class, 'submitQuiz']);
 $router->get('/quiz-result/{id}', [QuizController::class, 'showQuizResult']);

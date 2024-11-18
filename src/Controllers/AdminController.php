@@ -33,25 +33,4 @@ class AdminController {
             'recentQuizzes' => $recentQuizzes
         ])->render();
     }
-
-    public function quizzes($page) {
-        $quizModel = new Quiz();
-        $quizzesPerPage = 12;
-        $offset = ($page - 1) * $quizzesPerPage;
-        $quizzes = $quizModel->getAllQuizzesPaginated($quizzesPerPage, $offset);
-        $totalQuizzes = $quizModel->getQuizCount();
-        $totalPages = ceil($totalQuizzes / $quizzesPerPage);
-
-        $view = new View(
-            PathHelper::view('admin/quizzes/quizzes.php'),
-            PathHelper::layout('admin/admin.php')
-        );
-
-        $view->with([
-            'title' => 'List of Quizzes',
-            'quizzes' => $quizzes,
-            'currentPage' => $page,
-            'totalPages' => $totalPages
-        ])->render();
-    }
 }

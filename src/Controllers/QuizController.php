@@ -11,7 +11,7 @@ use App\View\View;
 use App\Helper\PathHelper;
 
 class QuizController {
-    public function showAllQuizzesPaginated($page = 1) {
+    public function showAllQuizzesForUsers($page = 1) {
             $quizModel = new Quiz();
             $quizzesPerPage = 9;
             $offset = ($page - 1) * $quizzesPerPage;
@@ -31,6 +31,27 @@ class QuizController {
             'totalPages' => $totalPages
         ])->render();
     }
+
+    public function showAllQuizzes($page = 1) {
+        $quizModel = new Quiz();
+        $quizzesPerPage = 9;
+        $offset = ($page - 1) * $quizzesPerPage;
+        $quizzes = $quizModel->getAllQuizzesPaginated($quizzesPerPage, $offset);
+        $totalQuizzes = $quizModel->getQuizCount();
+        $totalPages = ceil($totalQuizzes / $quizzesPerPage);
+
+    $view = new View(
+        PathHelper::view('admin/quizzes/quizzes.php'),
+            PathHelper::layout('admin/admin.php')
+    );
+
+    $view->with([
+        'title' => 'List of Quizzes',
+        'quizzes' => $quizzes,
+        'currentPage' => $page,
+        'totalPages' => $totalPages
+    ])->render();
+}
 
     public function showQuiz($id) {        
         $quizModel = new Quiz();
