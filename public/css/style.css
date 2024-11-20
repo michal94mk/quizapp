@@ -636,6 +636,46 @@ td.actions-column {
     text-decoration: none;
 }
 
+.chart-container {
+    width: 48%;
+    display: inline-block;
+    margin-right: 2%;
+    margin-bottom: 30px;
+}
+
+.clear {
+    clear: both;
+}
+
+.quiz-stats-container {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+.quiz-stats-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.quiz-stats {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.quiz-stats p {
+    margin: 8px 0;
+}
+
+.quiz-stats strong {
+    color: #000;
+}
+
 .dashboard-container {
     display: flex;
     flex-direction: row;

@@ -14,6 +14,7 @@ $router->get('/best-results/all', [HomeController::class, 'showTop10Results']);
 $router->get('/best-results/quiz/', [HomeController::class, 'showTop10ResultsForQuiz']);
 
 $router->get('/admin', [AdminController::class, 'index']);
+$router->get('/admin/stats', [AdminController::class, 'stats']);
 $router->paginate('/admin/quizzes', QuizController::class, 'showAllQuizzes');
 $router->get('/admin/add-quiz-form', [QuizController::class, 'addQuizForm']);
 $router->post('/admin/add-quiz', [QuizController::class, 'addQuiz']);
