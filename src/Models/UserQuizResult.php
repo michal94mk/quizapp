@@ -13,8 +13,12 @@ class UserQuizResult
 
     public function __construct()
     {
-        $db = new Database();
-        $this->conn = $db->getPdo();
+        try {
+            $db = new Database();
+            $this->conn = $db->getPdo();
+        } catch (\Exception $e) {
+            throw new \Exception('Database connection failed: ' . $e->getMessage());
+        }
     }
 
     public function createResult($userId, $quizId, $score)
@@ -32,54 +36,51 @@ class UserQuizResult
     {
         $query = "
             SELECT 
-                q.title AS quiz_title, 
-                u.username AS user_name, 
-                ur.score AS highest_score
-            FROM 
-                user_quiz_results ur
-            JOIN 
-                quizzes q ON ur.quiz_id = q.id
-            JOIN 
-                users u ON ur.user_id = u.id
-            ORDER BY 
-                ur.score DESC
-            LIMIT 
-                :limit 
-            OFFSET 
-                :offset
+                uqr.id AS result_id, 
+                users.username, 
+                quizzes.title AS quiz_title, 
+                uqr.score, 
+                uqr.completed_at
+            FROM user_quiz_results uqr
+            INNER JOIN users ON uqr.user_id = users.id
+            INNER JOIN quizzes ON uqr.quiz_id = quizzes.id
+            ORDER BY uqr.score DESC
+            LIMIT :limit OFFSET :offset
         ";
-
+    
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
-
+    
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    
 
     public function getTop10ResultsForQuiz($quizId)
     {
         $query = "
             SELECT 
-                u.username AS user_name, 
-                ur.score AS highest_score
-            FROM 
-                user_quiz_results ur
-            JOIN 
-                users u ON ur.user_id = u.id
-            WHERE 
-                ur.quiz_id = :quiz_id
-            ORDER BY 
-                ur.score DESC
+                uqr.id AS result_id, 
+                users.username, 
+                quizzes.title AS quiz_title, 
+                uqr.score, 
+                uqr.completed_at
+            FROM user_quiz_results uqr
+            INNER JOIN users ON uqr.user_id = users.id
+            INNER JOIN quizzes ON uqr.quiz_id = quizzes.id
+            WHERE uqr.quiz_id = :quiz_id
+            ORDER BY uqr.score DESC
             LIMIT 10
         ";
-
+    
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':quiz_id', $quizId, \PDO::PARAM_INT);
         $stmt->execute();
-
+    
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    
 
     public function getResultCountForQuiz($quizId = null)
     {

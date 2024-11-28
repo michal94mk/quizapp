@@ -18,52 +18,70 @@ class User
 
     public function __construct()
     {
-        $db = new Database();
-        $this->conn = $db->getPdo();
+        try {
+            $db = new Database();
+            $this->conn = $db->getPdo();
+        } catch (\Exception $e) {
+            throw new \Exception('Database connection failed: ' . $e->getMessage());
+        }
     }
 
     public function getAllUsersPaginated($limit, $offset)
     {
-        $query = "SELECT * FROM users LIMIT :limit OFFSET :offset";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
-        $stmt->execute();
+        try {
+            $query = "SELECT * FROM users LIMIT :limit OFFSET :offset";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+            $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
+            $stmt->execute();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            throw new \Exception('Error fetching users: ' . $e->getMessage());
+        }
     }
 
     public function getUserById($id)
     {
-        $query = "SELECT * FROM users WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        try {
+            $query = "SELECT * FROM users WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    
+            return $result ? $result : null;
+        } catch (\Exception $e) {
+            throw new \Exception('Error fetching user by ID: ' . $e->getMessage());
+        }
     }
 
     public function save()
     {
-        $query = "INSERT INTO {$this->table_name} 
-                  SET username = :username, 
-                      password = :password, 
-                      email = :email, 
-                      role = :role";
+        try {
+            $query = "INSERT INTO {$this->table_name} 
+                      SET username = :username, 
+                          password = :password, 
+                          email = :email, 
+                          role = :role";
 
-        $stmt = $this->conn->prepare($query);
+            $stmt = $this->conn->prepare($query);
 
-        $this->username = htmlspecialchars(strip_tags($this->username));
-        $this->password = htmlspecialchars(strip_tags($this->password));
-        $this->email = htmlspecialchars(strip_tags($this->email));
-        $this->role = htmlspecialchars(strip_tags($this->role));
+            $this->username = htmlspecialchars(strip_tags($this->username));
+            $this->password = htmlspecialchars(strip_tags($this->password));
+            $this->email = htmlspecialchars(strip_tags($this->email));
+            $this->role = htmlspecialchars(strip_tags($this->role));
 
-        $stmt->bindParam(':username', $this->username);
-        $stmt->bindParam(':password', $this->password);
-        $stmt->bindParam(':email', $this->email);
-        $stmt->bindParam(':role', $this->role);
+            $stmt->bindParam(':username', $this->username);
+            $stmt->bindParam(':password', $this->password);
+            $stmt->bindParam(':email', $this->email);
+            $stmt->bindParam(':role', $this->role);
 
-        return $stmt->execute();
+            return $stmt->execute();
+        } catch (\Exception $e) {
+            throw new \Exception('Error saving user: ' . $e->getMessage());
+        }
     }
 
     public function register($username, $password, $email, $role = 'user')
@@ -86,62 +104,78 @@ class User
 
     public function create($username, $password, $email, $role)
     {
-        $query = "INSERT INTO users (username, password, email, role) 
-                  VALUES (:username, :password, :email, :role)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':username', $username, \PDO::PARAM_STR);
-        $stmt->bindParam(':password', $password, \PDO::PARAM_STR);
-        $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
-        $stmt->bindParam(':role', $role, \PDO::PARAM_STR);
+        try {
+            $query = "INSERT INTO users (username, password, email, role) 
+                      VALUES (:username, :password, :email, :role)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':username', $username, \PDO::PARAM_STR);
+            $stmt->bindParam(':password', $password, \PDO::PARAM_STR);
+            $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
+            $stmt->bindParam(':role', $role, \PDO::PARAM_STR);
 
-        return $stmt->execute();
+            return $stmt->execute();
+        } catch (\Exception $e) {
+            throw new \Exception('Error creating user: ' . $e->getMessage());
+        }
     }
 
     public function update($id, $username, $password, $email, $role)
     {
-        if (empty($username)) {
-            echo "Nazwa użytkownika nie może być pusta.";
-            exit;
+        try {
+            if (empty($username)) {
+                throw new \Exception('Nazwa użytkownika nie może być pusta.');
+            }
+
+            $sql = "UPDATE users SET username = :username, email = :email, role = :role";
+            if (!empty($password)) {
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                $sql .= ", password = :password";
+            }
+            $sql .= " WHERE id = :id";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':role', $role);
+            $stmt->bindParam(':id', $id);
+
+            if (!empty($password)) {
+                $stmt->bindParam(':password', $hashedPassword);
+            }
+
+            return $stmt->execute();
+        } catch (\Exception $e) {
+            throw new \Exception('Error updating user: ' . $e->getMessage());
         }
-
-        $sql = "UPDATE users SET username = :username, email = :email, role = :role";
-        if (!empty($password)) {
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-            $sql .= ", password = :password";
-        }
-        $sql .= " WHERE id = :id";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':role', $role);
-        $stmt->bindParam(':id', $id);
-
-        if (!empty($password)) {
-            $stmt->bindParam(':password', $hashedPassword);
-        }
-
-        return $stmt->execute();
     }
 
     public function usernameExists($username)
     {
-        $query = "SELECT id FROM {$this->table_name} WHERE username = :username";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
+        try {
+            $query = "SELECT id FROM {$this->table_name} WHERE username = :username";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+            $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            return count($result) > 0;
+        } catch (\Exception $e) {
+            throw new \Exception('Error checking username existence: ' . $e->getMessage());
+        }
     }
 
     public function emailExists($email)
     {
-        $query = "SELECT id FROM {$this->table_name} WHERE email = :email";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
+        try {
+            $query = "SELECT id FROM {$this->table_name} WHERE email = :email";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+            return $stmt->rowCount() > 0;
+        } catch (\Exception $e) {
+            throw new \Exception('Error checking email existence: ' . $e->getMessage());
+        }
     }
 
     public function login($username, $password)
@@ -167,24 +201,37 @@ class User
 
     public function getUserCount()
     {
-        $query = "SELECT COUNT(*) FROM users";
-        $stmt = $this->conn->query($query);
+        try {
+            $query = "SELECT COUNT(*) FROM users";
+            $stmt = $this->conn->query($query);
 
-        return $stmt->fetchColumn();
+            return $stmt->fetchColumn();
+        } catch (\Exception $e) {
+            throw new \Exception('Error counting users: ' . $e->getMessage());
+        }
     }
 
     public function delete($id)
     {
-        $query = "DELETE FROM users WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-
-        return $stmt->execute();
+        try {
+            $query = "DELETE FROM users WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $result = $stmt->execute();
+    
+            return $result;
+        } catch (\Exception $e) {
+            throw new \Exception('Error deleting user: ' . $e->getMessage());
+        }
     }
 
     public function getRoleCounts()
     {
-        $query = "SELECT role, COUNT(*) AS user_count FROM users GROUP BY role";
-        return $this->conn->query($query)->fetchAll();
+        try {
+            $query = "SELECT role, COUNT(*) AS user_count FROM users GROUP BY role";
+            return $this->conn->query($query)->fetchAll();
+        } catch (\Exception $e) {
+            throw new \Exception('Error fetching role counts: ' . $e->getMessage());
+        }
     }
 }

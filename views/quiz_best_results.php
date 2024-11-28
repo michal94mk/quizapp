@@ -9,12 +9,18 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($results as $result): ?>
-            <tr>
-                <td><?= htmlspecialchars($result['user_name']) ?></td>
-                <td><?= htmlspecialchars($result['highest_score']) ?></td>
-            </tr>
-            <?php endforeach; ?>
+            <?php if (!empty($results)): ?>
+                <?php foreach ($results as $result): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($result['username']) ?></td>
+                        <td><?= htmlspecialchars($result['score']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="2">No results found for this quiz.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>
