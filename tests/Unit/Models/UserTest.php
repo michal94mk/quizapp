@@ -6,56 +6,127 @@ use App\Database\Database;
 
 class UserTest extends TestCase
 {
+    private $mockedDb;
+    private $mockedPdo;
     private $user;
-    private $db;
-    
+
     protected function setUp(): void
     {
-        $this->db = new Database();
-        $pdo = $this->db->getPdo();
-        
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-        $pdo->exec("DROP TABLE IF EXISTS users;");
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
-        
-        $pdo->exec("CREATE TABLE users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            role VARCHAR(50) DEFAULT 'user',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );");
-        
+        $this->mockedDb = $this->createMock(Database::class);
+
+        $this->mockedPdo = $this->createMock(PDO::class);
+        $this->mockedDb->method('getPdo')->willReturn($this->mockedPdo);
+
         $this->user = new User();
+
+        $reflection = new ReflectionClass($this->user);
+        $connProperty = $reflection->getProperty('conn');
+        $connProperty->setAccessible(true);
+        $connProperty->setValue($this->user, $this->mockedPdo);
     }
 
-    public function testCreateUser()
+    public function testGetAllUsersPaginated()
     {
-        $username = 'testuser';
-        $password = 'password123';
-        $email = 'testuser@example.com';
-        
-        $result = $this->user->register($username, $password, $email);
-        $this->assertEquals('Registration successful.', $result);
+        $mockedStatement = $this->createMock(PDOStatement::class);
+        $mockedStatement->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([['id' => 1, 'username' => 'test_user']]);
+
+        $this->mockedPdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains('SELECT * FROM users LIMIT :limit OFFSET :offset'))
+            ->willReturn($mockedStatement);
+
+        $mockedStatement->expects($this->once())->method('execute');
+
+        $result = $this->user->getAllUsersPaginated(10, 0);
+        $this->assertCount(1, $result);
+        $this->assertEquals('test_user', $result[0]['username']);
     }
 
-    public function testDeleteUser()
+    public function testGetUserById()
     {
-        $username = 'todeleteuser';
-        $email = 'todeleteuser@example.com';
-        
-        $this->user->register($username, 'password123', $email);
-        
-        $this->assertTrue($this->user->usernameExists($username));
-        
-        $user = $this->user->getUserById($username);
-        $userId = $user['id'];
-        
-        $this->assertTrue($this->user->delete($userId));
-        
-        $userAfterDelete = $this->user->getUserById($userId);
-        
-        $this->assertNull($userAfterDelete, 'User should be null after deletion');
+        $mockedStatement = $this->createMock(PDOStatement::class);
+        $mockedStatement->expects($this->once())
+            ->method('fetch')
+            ->willReturn(['id' => 1, 'username' => 'test_user']);
+
+        $this->mockedPdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains('SELECT * FROM users WHERE id = :id'))
+            ->willReturn($mockedStatement);
+
+        $mockedStatement->expects($this->once())->method('execute');
+
+        $result = $this->user->getUserById(1);
+        $this->assertNotNull($result);
+        $this->assertEquals('test_user', $result['username']);
+    }
+
+    public function testSave()
+    {
+        $mockedStatement = $this->createMock(PDOStatement::class);
+        $mockedStatement->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+    
+        $this->mockedPdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->callback(function ($query) {
+                $expectedSql = '/INSERT INTO users\s+SET\s+username\s*=\s*:username,\s+password\s*=\s*:password,\s+email\s*=\s*:email,\s+role\s*=\s*:role/i';
+                return preg_match($expectedSql, $query) === 1;
+            }))
+            ->willReturn($mockedStatement);
+    
+        $this->user->username = 'test_user';
+        $this->user->password = 'password123';
+        $this->user->email = 'test@example.com';
+        $this->user->role = 'user';
+    
+        $result = $this->user->save();
+        $this->assertTrue($result);
+    }
+    
+
+    public function testUsernameExists()
+    {
+        $mockedStatement = $this->createMock(PDOStatement::class);
+        $mockedStatement->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([['id' => 1]]);
+
+        $this->mockedPdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains('SELECT id FROM users WHERE username = :username'))
+            ->willReturn($mockedStatement);
+
+        $mockedStatement->expects($this->once())->method('execute');
+
+        $result = $this->user->usernameExists('test_user');
+        $this->assertTrue($result);
+    }
+
+    public function testLoginSuccess()
+    {
+        $mockedStatement = $this->createMock(PDOStatement::class);
+        $mockedStatement->expects($this->once())
+            ->method('fetch')
+            ->willReturn([
+                'id' => 1,
+                'username' => 'test_user',
+                'password' => password_hash('password123', PASSWORD_BCRYPT),
+                'role' => 'user',
+            ]);
+
+        $this->mockedPdo->expects($this->once())
+            ->method('prepare')
+            ->with($this->stringContains('SELECT id, username, role, password FROM users WHERE username = :username'))
+            ->willReturn($mockedStatement);
+
+        $mockedStatement->expects($this->once())->method('execute');
+
+        $result = $this->user->login('test_user', 'password123');
+        $this->assertIsArray($result);
+        $this->assertEquals('test_user', $result['username']);
     }
 }

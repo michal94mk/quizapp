@@ -11,7 +11,7 @@ class QuestionController {
     public function showAllQuestions($page = 1) {
         $questionModel = new Question();
         $quizModel = new Quiz();
-        $quizzes = $quizModel->getAllQuizzesTitles();
+        $quizzes = $quizModel->getAllQuizzes();
         $limit = 12;
         $offset = ($page - 1) * $limit;
         $questions = $questionModel->getAllQuestionsPaginated($limit, $offset);
@@ -34,7 +34,7 @@ class QuestionController {
 
     public function addQuestionForm() {
         $quizModel = new Quiz();
-        $quizzes = $quizModel->getAllQuizzesTitles();
+        $quizzes = $quizModel->getAllQuizzes();
         $view = new View(
             PathHelper::view('admin/questions/add_question.php'),
             PathHelper::layout('admin/admin.php')
@@ -78,7 +78,7 @@ class QuestionController {
         $questions = $questionModel->getQuestionsByQuizId($id);
 
         $quizModel = new Quiz();
-        $quizzes = $quizModel->getAllQuizzesTitles();
+        $quizzes = $quizModel->getAllQuizzes();
 
         $view = new View(
             PathHelper::view('admin/questions/update_question.php'),

@@ -1,92 +1,139 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace Tests\Unit\Models;
+
 use App\Models\Answer;
 use App\Database\Database;
+use PDO;
+use PHPUnit\Framework\TestCase;
 
 class AnswerTest extends TestCase
 {
+    private $mockedPdo;
+    private $mockedDb;
     private $answer;
 
     protected function setUp(): void
     {
-        $database = new Database();
-        $pdo = $database->getPdo();
-
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-        $pdo->exec("DROP TABLE IF EXISTS answers;");
-        $pdo->exec("DROP TABLE IF EXISTS quizzes;");
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
-
-        $pdo->exec("CREATE TABLE answers (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            question_id INT NOT NULL,
-            answer_text TEXT NOT NULL,
-            is_correct TINYINT(1) NOT NULL
-        );");
-
-        $pdo->exec("CREATE TABLE quizzes (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL
-        );");
-
-        $pdo->exec("INSERT INTO quizzes (title) VALUES ('Test Quiz');");
-
-        $this->answer = new Answer();
-    }
-
-    public function testCreateThrowsExceptionOnInvalidData()
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Quiz with ID  does not exist.');
-        
-        $this->answer->create(null, 'Sample Answer', true);
+        $this->mockedPdo = $this->createMock(PDO::class);
+    
+        $this->mockedDb = $this->createMock(Database::class);
+        $this->mockedDb->method('getPdo')->willReturn($this->mockedPdo);
+    
+        $this->answer = new Answer($this->mockedPdo);
     }
     
-
-    public function testUpdateThrowsExceptionOnInvalidData()
+    public function testCreateAnswerSuccess()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('No rows were updated. Answer with ID 999 might not exist.');
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetchColumn')->willReturn(1);
     
-        $this->answer->update(999, 'Updated Text', true);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+    
+        $this->mockedPdo->method('lastInsertId')->willReturn('1');
+    
+        $result = $this->answer->create(1, 'Example Answer', true);
+    
+        $this->assertEquals(1, $result);
     }
 
-    public function testDeleteThrowsExceptionIfAnswerDoesNotExist()
+    public function testCreateAnswerThrowsExceptionForNonExistentQuiz()
     {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage("No rows were deleted. Answer with ID 999 might not exist.");
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Quiz with ID 1 does not exist.');
 
-        $this->answer->delete(999);
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetchColumn')->willReturn(0);
+
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $this->answer->create(1, 'Example Answer', true);
     }
 
-    public function testGetAnswerByIdReturnsNullForNonExistentAnswer()
+    public function testUpdateAnswerThrowsExceptionForEmptyText()
     {
-        $result = $this->answer->getAnswerById(999);
-        $this->assertNull($result, "Expected null when fetching non-existent answer");
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Answer text cannot be empty.');
+
+        $this->answer->update(1, '', true);
     }
 
-    public function testCreateAndRetrieveAnswer()
+    public function testUpdateAnswerSuccess()
     {
-        $answerId = $this->answer->create(1, 'Sample Answer', true);
-        $this->assertIsInt($answerId);
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(1);
 
-        $retrievedAnswer = $this->answer->getAnswerById($answerId);
-        $this->assertNotNull($retrievedAnswer, "Answer with ID $answerId should exist.");
-        $this->assertEquals('Sample Answer', $retrievedAnswer['answer_text']);
-        $this->assertEquals(1, $retrievedAnswer['question_id']);
-        $this->assertEquals(1, $retrievedAnswer['is_correct']);
-    }
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
 
-    public function testDeleteRemovesAnswerSuccessfully()
-    {
-        $answerId = $this->answer->create(1, 'Sample Answer', true);
-        $this->assertIsInt($answerId);
+        $result = $this->answer->update(1, 'Updated Answer', false);
 
-        $result = $this->answer->delete($answerId);
         $this->assertTrue($result);
+    }
 
-        $deletedAnswer = $this->answer->getAnswerById($answerId);
-        $this->assertNull($deletedAnswer, "Answer with ID $answerId should have been deleted.");
+    public function testDeleteAnswerSuccess()
+    {
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(1);
+
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $result = $this->answer->delete(1);
+
+        $this->assertTrue($result);
+    }
+
+    public function testDeleteAnswerThrowsExceptionWhenAnswerNotExist()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No rows were deleted. Answer with ID 1 might not exist.');
+
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(0);
+
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $this->answer->delete(1);
+    }
+
+    public function testGetAnswerById()
+    {
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetch')->willReturn([
+            'id' => 1,
+            'question_id' => 1,
+            'answer_text' => 'Example Answer',
+            'is_correct' => 1,
+        ]);
+
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $result = $this->answer->getAnswerById(1);
+
+        $this->assertIsArray($result);
+        $this->assertEquals(1, $result['id']);
+    }
+
+    public function testGetAnswersByQuestionId()
+    {
+        $stmtMock = $this->createMock(\PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetchAll')->willReturn([
+            ['id' => 1, 'question_id' => 1, 'answer_text' => 'Answer 1', 'is_correct' => 1],
+            ['id' => 2, 'question_id' => 1, 'answer_text' => 'Answer 2', 'is_correct' => 0],
+        ]);
+
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $result = $this->answer->getAnswersByQuestionId(1);
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertEquals('Answer 1', $result[0]['answer_text']);
     }
 }

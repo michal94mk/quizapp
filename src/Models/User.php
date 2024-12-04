@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Database\Database;
+use PDO;
 
 class User
 {
@@ -16,13 +17,13 @@ class User
     public $role;
     public $created_at;
 
-    public function __construct()
+    public function __construct(PDO $pdo = null)
     {
-        try {
+        if ($pdo) {
+            $this->conn = $pdo;
+        } else {
             $db = new Database();
             $this->conn = $db->getPdo();
-        } catch (\Exception $e) {
-            throw new \Exception('Database connection failed: ' . $e->getMessage());
         }
     }
 

@@ -9,13 +9,13 @@ use PDOException;
 class Answer {
     private $conn;
 
-    public function __construct()
+    public function __construct(PDO $pdo = null)
     {
-        try {
+        if ($pdo) {
+            $this->conn = $pdo;
+        } else {
             $db = new Database();
             $this->conn = $db->getPdo();
-        } catch (\Exception $e) {
-            throw new \Exception('Database connection failed: ' . $e->getMessage());
         }
     }
 

@@ -217,6 +217,20 @@ class QuizController {
         ])->render();
     }
 
+    public function updateQuiz() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'];
+            $title = $_POST['title'];
+            $description = $_POST['description'];
+    
+            $quizModel = new Quiz();
+            $quizModel->update($id, $title, $description);
+        }
+        
+        header('Location: /admin/quizzes');
+    }
+    
+
     public function deleteQuiz() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'];

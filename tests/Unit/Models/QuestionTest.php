@@ -1,108 +1,153 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace Tests\Unit\Models;
+
 use App\Models\Question;
 use App\Database\Database;
+use PDO;
+use PDOStatement;
+use PHPUnit\Framework\TestCase;
 
 class QuestionTest extends TestCase
 {
+    private $mockedPdo;
+    private $mockedDb;
     private $question;
 
     protected function setUp(): void
     {
-        $database = new Database();
-        $pdo = $database->getPdo();
+        $this->mockedPdo = $this->createMock(PDO::class);
 
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-        $pdo->exec("DROP TABLE IF EXISTS questions;");
-        $pdo->exec("DROP TABLE IF EXISTS quizzes;");
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+        $this->mockedDb = $this->createMock(Database::class);
+        $this->mockedDb->method('getPdo')->willReturn($this->mockedPdo);
 
-        $pdo->exec("
-            CREATE TABLE quizzes (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                description TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        ");
-
-        $pdo->exec("
-            CREATE TABLE questions (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                quiz_id INT NOT NULL,
-                question_text TEXT NOT NULL,
-                question_type VARCHAR(50) NOT NULL,
-                FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
-            );
-        ");
-
-        $pdo->exec("INSERT INTO quizzes (id, title, description) VALUES (1, 'Sample Quiz', 'Description');");
-
-        $this->question = new Question();
+        $this->question = new Question($this->mockedPdo);
     }
 
-    public function testCreate(): void
+    public function testCreateQuestionSuccess()
     {
-        $questionId = $this->question->create(1, 'What is the capital of France?', 'multiple-choice');
-        $this->assertIsInt($questionId);
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetchColumn')->willReturn(1);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+        $this->mockedPdo->method('lastInsertId')->willReturn('123');
 
-        $createdQuestion = $this->question->getQuestionById($questionId);
-        $this->assertNotNull($createdQuestion);
-        $this->assertEquals('What is the capital of France?', $createdQuestion['question_text']);
-        $this->assertEquals('multiple-choice', $createdQuestion['question_type']);
-        $this->assertEquals(1, $createdQuestion['quiz_id']);
+        $result = $this->question->create(1, 'What is PHP?', 'multiple_choice');
+
+        $this->assertEquals('123', $result);
     }
 
-    public function testDelete(): void
+    public function testDeleteQuestionSuccess()
     {
-        $questionId = $this->question->create(1, 'What is the capital of France?', 'multiple-choice');
-        $this->assertNotNull($questionId);
-
-        $result = $this->question->delete($questionId);
-        $this->assertTrue($result, 'Failed to delete the question');
-
-        $deletedQuestion = $this->question->getQuestionById($questionId);
-        $this->assertNull($deletedQuestion, 'The question still exists in the database');
-    }
-
-    public function testCreateThrowsExceptionOnInvalidQuizId()
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Quiz with ID 999 does not exist.');
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(1);
     
-        $this->question->create(999, 'Invalid Question', 'text');
-    }    
-
-    public function testUpdateThrowsExceptionOnInvalidQuestionId()
-    {
-        $result = $this->question->update(999, 1, 'Updated Question', 'multiple-choice');
-        $this->assertFalse($result, 'Expected update to fail for non-existent question');
-    }
-       
-    public function testDeleteThrowsExceptionOnNonExistentQuestion(): void
-    {
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Question with ID 999 does not exist.');
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
     
-        $this->question->delete(999);
-    }    
+        $questionMock = $this->getMockBuilder(Question::class)
+            ->setConstructorArgs([$this->mockedPdo])
+            ->onlyMethods(['getQuestionById'])
+            ->getMock();
+    
+        $questionMock->method('getQuestionById')->willReturn([
+            'id' => 1,
+            'quiz_id' => 1,
+            'question_text' => 'What is PHP?',
+            'question_type' => 'multiple_choice',
+        ]);
+    
+        $result = $questionMock->delete(1);
+    
+        $this->assertTrue($result);
+    }
+    
 
-    public function testGetQuestionByIdReturnsNullForNonExistentQuestion(): void
+    public function testDeleteQuestionThrowsExceptionWhenNoRowsDeleted()
     {
-        $result = $this->question->getQuestionById(999);
-        $this->assertNull($result, 'Expected null when fetching non-existent question');
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(0);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Pytanie o ID 1 nie istnieje.');
+
+        $this->question->delete(1);
     }
 
-    public function testCreateAndRetrieveMultipleQuestions(): void
+    public function testUpdateQuestionSuccess()
     {
-        $question1 = $this->question->create(1, 'First question?', 'text');
-        $question2 = $this->question->create(1, 'Second question?', 'multiple-choice');
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(1);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
 
-        $questions = $this->question->getQuestionsByQuizId(1);
+        $result = $this->question->update(1, 1, 'What is PHP?', 'multiple_choice');
 
-        $this->assertCount(2, $questions, 'Expected two questions for the quiz');
-        $this->assertEquals('First question?', $questions[0]['question_text']);
-        $this->assertEquals('Second question?', $questions[1]['question_text']);
+        $this->assertTrue($result);
+    }
+
+    public function testUpdateQuestionReturnsFalseWhenNoRowsUpdated()
+    {
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('rowCount')->willReturn(0);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $result = $this->question->update(1, 1, 'What is PHP?', 'multiple_choice');
+
+        $this->assertFalse($result);
+    }
+
+    public function testGetAllQuestionsPaginated()
+    {
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetchAll')->willReturn([
+            [
+                'id' => 1,
+                'quiz_id' => 1,
+                'question_text' => 'What is PHP?',
+                'question_type' => 'multiple_choice',
+                'quiz_title' => 'PHP Quiz'
+            ]
+        ]);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $result = $this->question->getAllQuestionsPaginated(10, 0);
+
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertEquals('What is PHP?', $result[0]['question_text']);
+    }
+
+    public function testGetQuestionById()
+    {
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('execute')->willReturn(true);
+        $stmtMock->method('fetch')->willReturn([
+            'id' => 1,
+            'quiz_id' => 1,
+            'question_text' => 'What is PHP?',
+            'question_type' => 'multiple_choice'
+        ]);
+        $this->mockedPdo->method('prepare')->willReturn($stmtMock);
+
+        $result = $this->question->getQuestionById(1);
+
+        $this->assertIsArray($result);
+        $this->assertEquals('What is PHP?', $result['question_text']);
+    }
+
+    public function testGetQuestionCount()
+    {
+        $stmtMock = $this->createMock(PDOStatement::class);
+        $stmtMock->method('fetchColumn')->willReturn(5);
+        $this->mockedPdo->method('query')->willReturn($stmtMock);
+
+        $result = $this->question->getQuestionCount();
+
+        $this->assertEquals(5, $result);
     }
 }

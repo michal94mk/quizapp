@@ -3,59 +3,80 @@
 namespace App\Models;
 
 use App\Database\Database;
+use PDO;
 
 class Quiz
 {
     private $conn;
 
-    public function __construct()
+    public function __construct(PDO $pdo = null)
     {
-        $db = new Database();
-        $this->conn = $db->getPdo();
+        if ($pdo) {
+            $this->conn = $pdo;
+        } else {
+            $db = new Database();
+            $this->conn = $db->getPdo();
+        }
     }
 
-    public function create($title, $description)
+    private function prepareAndExecute(string $query, array $params = [])
     {
+        $stmt = $this->conn->prepare($query);
+        if (!$stmt) {
+            throw new \Exception('Failed to prepare query: ' . implode(', ', $this->conn->errorInfo()));
+        }
+
+        if (!$stmt->execute($params)) {
+            throw new \Exception('Failed to execute query: ' . implode(', ', $stmt->errorInfo()));
+        }
+
+        return $stmt;
+    }
+
+    public function create(string $title, ?string $description)
+    {
+        if (empty(trim($title))) {
+            throw new \InvalidArgumentException("Quiz title cannot be empty.");
+        }
+
         $query = "INSERT INTO quizzes (title, description) VALUES (:title, :description)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':title', $title, \PDO::PARAM_STR);
-        $stmt->bindParam(':description', $description, \PDO::PARAM_STR);
+        $this->prepareAndExecute($query, ['title' => $title, 'description' => $description]);
 
-        return $stmt->execute();
+        return true;
     }
 
-    public function update($id, $title, $description)
+    public function update(int $id, string $title, ?string $description)
     {
-        $query = "UPDATE quizzes SET title = :title, description = :description WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-        $stmt->bindParam(':title', $title, \PDO::PARAM_STR);
-        $stmt->bindParam(':description', $description, \PDO::PARAM_STR);
+        if (empty(trim($title))) {
+            throw new \InvalidArgumentException("Quiz title cannot be empty.");
+        }
 
-        return $stmt->execute();
+        $query = "UPDATE quizzes SET title = :title, description = :description WHERE id = :id";
+        return $this->prepareAndExecute($query, [
+            'id' => $id,
+            'title' => $title,
+            'description' => $description
+        ])->rowCount() > 0;
     }
 
-    public function delete($id)
+    public function delete(int $id)
     {
         $query = "DELETE FROM quizzes WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-
-        return $stmt->execute();
+        return $this->prepareAndExecute($query, ['id' => $id])->rowCount() > 0;
     }
 
-    public function getQuizById($id)
+    public function getQuizById(int $id)
     {
         $query = "SELECT * FROM quizzes WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $this->prepareAndExecute($query, ['id' => $id])->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getAllQuizzesPaginated($limit, $offset)
+    public function getAllQuizzesPaginated(int $limit, int $offset)
     {
+        if ($limit <= 0 || $offset < 0) {
+            throw new \InvalidArgumentException("Limit and offset must be non-negative integers.");
+        }
+
         $query = "
             SELECT 
                 q.id AS quiz_id,
@@ -76,46 +97,37 @@ class Quiz
         ";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getAllQuizzes()
     {
         $query = "SELECT id, title FROM quizzes";
-        $stmt = $this->conn->query($query);
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    public function getAllQuizzesTitles()
-    {
-        $query = "SELECT * FROM quizzes";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->conn->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getQuizCount()
     {
-        $query = "SELECT COUNT(*) as count FROM quizzes";
-        $stmt = $this->conn->query($query);
-
-        return $stmt->fetch(\PDO::FETCH_ASSOC)['count'];
+        $query = "SELECT COUNT(*) AS count FROM quizzes";
+        return (int) $this->conn->query($query)->fetch(PDO::FETCH_ASSOC)['count'];
     }
 
-    public function getRecentQuizzes($limit = 5)
+    public function getRecentQuizzes(int $limit = 5)
     {
+        if ($limit <= 0) {
+            throw new \InvalidArgumentException("Limit must be a positive integer.");
+        }
+
         $query = "SELECT * FROM quizzes ORDER BY created_at DESC LIMIT :limit";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getQuizStats()
@@ -134,13 +146,15 @@ class Quiz
             FROM quizzes
         ";
 
-        $stmt = $this->conn->query($query);
-
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $this->conn->query($query)->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getTopQuizzes($limit = 5)
+    public function getTopQuizzes(int $limit = 5)
     {
+        if ($limit <= 0) {
+            throw new \InvalidArgumentException("Limit must be a positive integer.");
+        }
+
         $query = "
             SELECT 
                 title, 
@@ -158,10 +172,10 @@ class Quiz
         ";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getQuizPerformance()
@@ -178,6 +192,6 @@ class Quiz
                 q.id
         ";
 
-        return $this->conn->query($query)->fetchAll();
+        return $this->conn->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

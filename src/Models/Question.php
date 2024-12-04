@@ -9,18 +9,22 @@ use PDOException;
 class Question {
     private $conn;
 
-    public function __construct()
+    public function __construct(PDO $pdo = null)
     {
-        try {
+        if ($pdo) {
+            $this->conn = $pdo;
+        } else {
             $db = new Database();
             $this->conn = $db->getPdo();
-        } catch (\Exception $e) {
-            throw new \Exception('Database connection failed: ' . $e->getMessage());
         }
     }
 
     public function create($quizId, $questionText, $questionType)
     {
+        if (empty($questionText) || strlen($questionText) > 255) {
+            throw new \Exception("Pytanie musi mieć tekst, który nie jest pusty i nie przekracza 255 znaków.");
+        }
+
         $query = "SELECT COUNT(*) FROM quizzes WHERE id = :quiz_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':quiz_id', $quizId, PDO::PARAM_INT);
@@ -28,7 +32,7 @@ class Question {
         $quizExists = $stmt->fetchColumn() > 0;
     
         if (!$quizExists) {
-            throw new \Exception("Quiz with ID $quizId does not exist.");
+            throw new \Exception("Quiz z ID $quizId nie istnieje.");
         }
     
         $query = "INSERT INTO questions (quiz_id, question_text, question_type) VALUES (:quiz_id, :question_text, :question_type)";
@@ -40,8 +44,13 @@ class Question {
     
         return (int) $this->conn->lastInsertId();
     }
-    
-    public function update($id, $quizId, $questionText, $questionType) {
+
+    public function update($id, $quizId, $questionText, $questionType)
+    {
+        if (empty($questionText) || strlen($questionText) > 255) {
+            throw new \Exception("Pytanie musi mieć tekst, który nie jest pusty i nie przekracza 255 znaków.");
+        }
+
         try {
             $query = "UPDATE questions SET quiz_id = :quiz_id, question_text = :question_text, question_type = :question_type WHERE id = :id";
             $stmt = $this->conn->prepare($query);
@@ -57,25 +66,33 @@ class Question {
     
             return true;
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             return false;
         }
     }
-    
+
     public function delete($id)
     {
-        $query = "DELETE FROM questions WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-    
-        if ($stmt->rowCount() === 0) {
-            throw new \Exception("Question with ID $id does not exist.");
+        $question = $this->getQuestionById($id);
+        if (!$question) {
+            throw new \Exception("Pytanie o ID $id nie istnieje.");
         }
-    
-        return true;
-    }       
 
-    public function getAllQuestionsPaginated($limit, $offset) {
+        try {
+            $query = "DELETE FROM questions WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            return true;
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            throw new \Exception("Nie udało się usunąć pytania.");
+        }
+    }
+
+    public function getAllQuestionsPaginated($limit, $offset)
+    {
         try {
             $query = "
             SELECT q.*, qu.title AS quiz_title
@@ -89,11 +106,13 @@ class Question {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             return [];
         }
     }
 
-    public function getQuestionById($id) {
+    public function getQuestionById($id)
+    {
         try {
             $query = "SELECT * FROM questions WHERE id = :id";
             $stmt = $this->conn->prepare($query);
@@ -101,11 +120,13 @@ class Question {
             $stmt->execute();
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             return null;
         }
     }
 
-    public function getQuestionsByQuizId($quizId) {
+    public function getQuestionsByQuizId($quizId)
+    {
         try {
             $query = "SELECT * FROM questions WHERE quiz_id = :quiz_id";
             $stmt = $this->conn->prepare($query);
@@ -113,16 +134,19 @@ class Question {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             return [];
         }
     }
 
-    public function getQuestionCount() {
+    public function getQuestionCount()
+    {
         try {
             $query = "SELECT COUNT(*) FROM questions";
             $stmt = $this->conn->query($query);
             return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
+            error_log($e->getMessage());
             return 0;
         }
     }
